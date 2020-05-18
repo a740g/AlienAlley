@@ -6,74 +6,73 @@
 |  /_/   \_\_|_|\___|_| |_| /_/   \_\_|_|\___|\__, |       |
 |                                             |___/        |
 |													       |
-|  Conversion/port copyright (c) Samuel Gomes, 1998-2019.  |
+|  Conversion/port copyright (c) Samuel Gomes, 1998-2020.  |
 |  All rights reserved.                                    |
 |														   |
 \*--------------------------------------------------------*/
 
 //---------------------------------------------------------------------------
 // All header files that we need
-#include "allegro5/allegro.h"
-#include "allegro5/allegro_image.h"
-#include "allegro5/allegro_primitives.h"
+#include "allegro5/allegro5.h"
+#include "allegro5/allegro_font.h"
 
 /* CONSTANTS */
 constexpr auto INTRO_TEXT_COLOR = 15;
 constexpr auto MAX_ALIENS = 4;
 constexpr auto MAX_ALIEN_MISSILES = 20;
 constexpr auto MAX_HERO_MISSILES = 10;
-#define MAX_EXPLOSIONS				(MAX_ALIENS + 1) /* +1 for hero */
-#define MAX_EXPLOSION_BITMAPS 		5
-#define GUN_COLOR					8
-#define GUN_BLINK_RATE				20
-#define HERO_X_VELOCITY				3
-#define HERO_Y_VELOCITY				3
-#define ALIEN_X_VELOCITY			3
-#define ALIEN_Y_VELOCITY			2
-#define HERO_MISSILE_VELOCITY		5
-#define ALIEN_MISSILE_VELOCITY		4
-#define MAX_MOVE_STEP				8	/* max sprite movement (hero missile) */
-#define ALIEN_MOVE_TIME_VAR			50
-#define ALIEN_MOVE_TIME_BASE		20
-#define ALIEN_GEN_RATE_BASE			40
-#define ALIEN_GEN_RATE_VAR			40
-#define ALIEN_FIRE_LOCKOUT			60
-#define ALIEN_FIRE_PROB_HERO		20
-#define ALIEN_FIRE_PROB_RANDOM		10
-#define ALIEN_PROX_THRESHOLD		20
-#define HERO_GUN_OFFSET_LEFT		3
-#define HERO_GUN_OFFSET_RIGHT		26
-#define HERO_GUN_OFFSET_UP			10
-#define ALIEN_GUN_OFFSET_LEFT		4
-#define ALIEN_GUN_OFFSET_RIGHT		25
-#define ALIEN_GUN_OFFSET_DOWN		20
-constexpr auto DEATH_DELAY = 60;		/* 1 sec delay after player death */
+constexpr auto MAX_EXPLOSIONS = MAX_ALIENS + 1;			/* +1 for hero */
+constexpr auto MAX_EXPLOSION_BITMAPS = 5;
+constexpr auto GUN_COLOR = 8;
+constexpr auto GUN_BLINK_RATE = 20;
+constexpr auto HERO_X_VELOCITY = 3;
+constexpr auto HERO_Y_VELOCITY = 3;
+constexpr auto ALIEN_X_VELOCITY = 3;
+constexpr auto ALIEN_Y_VELOCITY = 2;
+constexpr auto HERO_MISSILE_VELOCITY = 5;
+constexpr auto ALIEN_MISSILE_VELOCITY = 4;
+constexpr auto MAX_MOVE_STEP = 8;						/* max sprite movement (hero missile) */
+constexpr auto ALIEN_MOVE_TIME_VAR = 50;
+constexpr auto ALIEN_MOVE_TIME_BASE = 20;
+constexpr auto ALIEN_GEN_RATE_BASE = 40;
+constexpr auto ALIEN_GEN_RATE_VAR = 40;
+constexpr auto ALIEN_FIRE_LOCKOUT = 60;
+constexpr auto ALIEN_FIRE_PROB_HERO = 20;
+constexpr auto ALIEN_FIRE_PROB_RANDOM = 10;
+constexpr auto ALIEN_PROX_THRESHOLD = 20;
+constexpr auto HERO_GUN_OFFSET_LEFT = 3;
+constexpr auto HERO_GUN_OFFSET_RIGHT = 26;
+constexpr auto HERO_GUN_OFFSET_UP = 10;
+constexpr auto ALIEN_GUN_OFFSET_LEFT = 4;
+constexpr auto ALIEN_GUN_OFFSET_RIGHT = 25;
+constexpr auto ALIEN_GUN_OFFSET_DOWN = 20;
+constexpr auto DEATH_DELAY = 60;						/* 1 sec delay after player death */
 constexpr auto POINTS_PER_ALIEN = 10;
-#define MAX_HERO_SHIELDS			(SHIELD_STATUS_WIDTH - 1)
 constexpr auto SHIELD_STATUS_WIDTH = 80;
+constexpr auto MAX_HERO_SHIELDS = SHIELD_STATUS_WIDTH - 1;
 constexpr auto SHIELD_STATUS_HEIGHT = 20;
 constexpr auto SHIELD_STATUS_LEFT = 192;
 constexpr auto SHIELD_STATUS_TOP = 440;
-#define SHIELD_STATUS_RIGHT 		(SHIELD_STATUS_LEFT + SHIELD_STATUS_WIDTH - 1)
-#define SHIELD_STATUS_BOTTOM 		(SHIELD_STATUS_TOP + SHIELD_STATUS_HEIGHT - 1)
+constexpr auto SHIELD_STATUS_RIGHT = SHIELD_STATUS_LEFT + SHIELD_STATUS_WIDTH - 1;
+constexpr auto SHIELD_STATUS_BOTTOM = SHIELD_STATUS_TOP + SHIELD_STATUS_HEIGHT - 1;
 constexpr auto SHIELD_STATUS_COLOR = 47;
 constexpr auto SHIELD_STATUS_INVERT_COLOR = 173;
 constexpr auto STATUS_BACKGROUND_COLOR = 27;
-#define SCORE_NUMBERS_LEFT			474
-#define SCORE_NUMBERS_TOP			443
-#define EXPLOSION_FRAME_REPEAT_COUNT 3
-#define HIGH_SCORE_TEXT_LEN			20
-#define HIGH_SCORE_FILENAME 		ExePath & "/dat/highscore.dat"
-#define HIGH_SCORE_COLOR        	2
-#define TILE_WIDTH					32 /* in pixels */
-#define TILE_HEIGHT					32
-#define NUM_TILES					3
-#define UPDATES_PER_SECOND			60
+constexpr auto SCORE_NUMBERS_LEFT = 474;
+constexpr auto SCORE_NUMBERS_TOP = 443;
+constexpr auto EXPLOSION_FRAME_REPEAT_COUNT = 3;
+constexpr auto HIGH_SCORE_TEXT_LEN = 20;
+constexpr auto HIGH_SCORE_FILENAME = "highscore.dat";
+constexpr auto HIGH_SCORE_COLOR = 2;
+constexpr auto TILE_WIDTH = 32;							/* in pixels */
+constexpr auto TILE_HEIGHT = 32;
+constexpr auto NUM_TILES = 3;
+constexpr auto UPDATES_PER_SECOND = 60;
 /* screen parameters */
 constexpr auto SCREEN_WIDTH = 640;
 constexpr auto SCREEN_HEIGHT = 480;
-#define REDUCED_SCREEN_HEIGHT		(SCREEN_HEIGHT - STATUS_HEIGHT)
-constexpr auto STATUS_HEIGHT = 60;		// our hud is 60 pixels now 30 * 2 in 640x480 mode
+constexpr auto STATUS_HEIGHT = 60;						// our hud is 60 pixels now 30 * 2 in 640x480 mode
+constexpr auto REDUCED_SCREEN_HEIGHT = SCREEN_HEIGHT - STATUS_HEIGHT;
 /* scrolling parameters */
 constexpr auto MAP_SCROLL_STEP_NORMAL = 1;
 constexpr auto MAP_SCROLL_STEP_FAST = 2;
@@ -82,20 +81,45 @@ constexpr auto MAP_SCROLL_STEP_FAST = 2;
 // Program entry point
 int main(int argc, char** argv)
 {
-	ALLEGRO_DISPLAY* display = NULL;
-	ALLEGRO_DISPLAY_MODE   disp_data;
+	al_init();
+	al_install_keyboard();
 
-	al_init(); // I'm not checking the return value for simplicity.
-	al_init_image_addon();
-	al_init_primitives_addon();
+	ALLEGRO_TIMER* timer = al_create_timer(1.0 / 30.0);
+	ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
+	ALLEGRO_DISPLAY* disp = al_create_display(SCREEN_WIDTH, SCREEN_HEIGHT);
+	ALLEGRO_FONT* font = al_create_builtin_font();
 
-	al_get_display_mode(al_get_num_display_modes() - 1, &disp_data);
+	al_register_event_source(queue, al_get_keyboard_event_source());
+	al_register_event_source(queue, al_get_display_event_source(disp));
+	al_register_event_source(queue, al_get_timer_event_source(timer));
 
-	al_set_new_display_flags(ALLEGRO_FULLSCREEN);
-	display = al_create_display(disp_data.width, disp_data.height);
+	bool redraw = true;
+	ALLEGRO_EVENT event;
 
-	al_rest(3);
-	al_destroy_display(display);
+	al_start_timer(timer);
+	while (1)
+	{
+		al_wait_for_event(queue, &event);
+
+		if (event.type == ALLEGRO_EVENT_TIMER)
+			redraw = true;
+		else if ((event.type == ALLEGRO_EVENT_KEY_DOWN) || (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE))
+			break;
+
+		if (redraw && al_is_event_queue_empty(queue))
+		{
+			al_clear_to_color(al_map_rgb(0, 0, 0));
+			al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0, "Hello world!");
+			al_flip_display();
+
+			redraw = false;
+		}
+	}
+
+	al_destroy_font(font);
+	al_destroy_display(disp);
+	al_destroy_timer(timer);
+	al_destroy_event_queue(queue);
 
 	return 0;
 }
