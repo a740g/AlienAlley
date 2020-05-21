@@ -75,9 +75,9 @@ constexpr auto TILE_HEIGHT = 32;
 constexpr auto NUM_TILES = 3;
 constexpr auto UPDATES_PER_SECOND = 60;
 // screen parameters
-constexpr auto BUFFER_W = 320;
-constexpr auto BUFFER_H = 240;
-constexpr auto DISP_SCALE = 3;
+constexpr auto BUFFER_W = 640;
+constexpr auto BUFFER_H = 480;
+constexpr auto DISP_SCALE = 2;
 constexpr auto SCREEN_WIDTH = BUFFER_W * DISP_SCALE;
 constexpr auto SCREEN_HEIGHT = BUFFER_H * DISP_SCALE;
 constexpr auto STATUS_HEIGHT = 60;						// our hud is 60 pixels now 30 * 2 in 640x480 mode
@@ -193,9 +193,6 @@ void keyboard_update(ALLEGRO_EVENT* event)
 #define SHIP_SHOT_W 2
 #define SHIP_SHOT_H 9
 
-#define LIFE_W 6
-#define LIFE_H 6
-
 const int ALIEN_W[] = { 14, 13, 45 };
 const int ALIEN_H[] = { 9, 10, 27 };
 
@@ -209,7 +206,7 @@ const int ALIEN_H[] = { 9, 10, 27 };
 #define ALIEN_SHOT_W 4
 #define ALIEN_SHOT_H 4
 
-#define EXPLOSION_FRAMES 4
+#define EXPLOSION_FRAMES 5
 #define SPARKS_FRAMES    3
 
 
@@ -221,6 +218,8 @@ typedef struct SPRITES
 
 	ALLEGRO_BITMAP* ship_shot[2];
 	ALLEGRO_BITMAP* life;
+	int life_w;
+	int life_h;
 
 	ALLEGRO_BITMAP* alien[3];
 	ALLEGRO_BITMAP* alien_shot;
@@ -228,7 +227,7 @@ typedef struct SPRITES
 	ALLEGRO_BITMAP* explosion;
 	ALLEGRO_BITMAP* sparks;
 
-	ALLEGRO_BITMAP* powerup[4];
+	ALLEGRO_BITMAP* powerup;
 } SPRITES;
 SPRITES sprites;
 
@@ -241,6 +240,8 @@ void sprites_init()
 
 	sprites.life = al_load_bitmap("dat/gfx/life.png");
 	must_init(sprites.life, "dat/gfx/life.png");
+	sprites.life_w = al_get_bitmap_width(sprites.life);
+	sprites.life_h = al_get_bitmap_height(sprites.life);
 
 	sprites.ship_shot[0] = al_load_bitmap("dat/gfx/ship_shot0.png");
 	must_init(sprites.ship_shot[0], "dat/gfx/ship_shot0.png");
@@ -257,20 +258,14 @@ void sprites_init()
 	sprites.alien_shot = al_load_bitmap("dat/gfx/alien_shot.png");
 	must_init(sprites.alien_shot, "dat/gfx/alien_shot.png");
 
-	sprites.explosion = al_load_bitmap("dat/gfx/explosion1_ss.png");
-	must_init(sprites.explosion, "dat/gfx/explosion1_ss.png");
+	sprites.explosion = al_load_bitmap("dat/gfx/explosion2_ss.png");
+	must_init(sprites.explosion, "dat/gfx/explosion2_ss.png");
 
 	sprites.sparks = al_load_bitmap("dat/gfx/sparks_ss.png");
 	must_init(sprites.sparks, "dat/gfx/sparks_ss.png");
 
-	sprites.powerup[0] = al_load_bitmap("dat/gfx/powerup0.png");
-	must_init(sprites.powerup[0], "dat/gfx/powerup0.png");
-	sprites.powerup[1] = al_load_bitmap("dat/gfx/powerup1.png");
-	must_init(sprites.powerup[1], "dat/gfx/powerup1.png");
-	sprites.powerup[2] = al_load_bitmap("dat/gfx/powerup2.png");
-	must_init(sprites.powerup[2], "dat/gfx/powerup2.png");
-	sprites.powerup[3] = al_load_bitmap("dat/gfx/powerup3.png");
-	must_init(sprites.powerup[3], "dat/gfx/powerup3.png");
+	sprites.powerup = al_load_bitmap("dat/gfx/powerup_ss.png");
+	must_init(sprites.powerup, "dat/gfx/powerup_ss.png");
 }
 
 void sprites_deinit()
@@ -288,10 +283,7 @@ void sprites_deinit()
 
 	al_destroy_bitmap(sprites.explosion);
 
-	al_destroy_bitmap(sprites.powerup[0]);
-	al_destroy_bitmap(sprites.powerup[1]);
-	al_destroy_bitmap(sprites.powerup[2]);
-	al_destroy_bitmap(sprites.powerup[3]);
+	al_destroy_bitmap(sprites.powerup);
 }
 
 
@@ -922,7 +914,7 @@ void hud_draw()
 		score_display
 	);
 
-	int spacing = LIFE_W + 1;
+	int spacing = sprites.life_w + 1;
 	for (int i = 0; i < ship.lives; i++)
 		al_draw_bitmap(sprites.life, 1 + (i * spacing), 10, 0);
 
