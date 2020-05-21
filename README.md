@@ -1,5 +1,5 @@
 # AlienAlley
-![Screenshot](screenshot.jpg)  
+![Screenshot](screenshot.gif)  
 Source port of Alien Alley demo game by Dave Roberts.
 This was a FreeBASIC/Allegro/Win32 port/conversion of the Alien Alley game by Dave Roberts done by me.
 Which, I am now returning to C/C++ using Allegro 5. Homecoming!
