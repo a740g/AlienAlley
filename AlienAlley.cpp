@@ -22,13 +22,12 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_native_dialog.h>
 
-
 // Constants
 constexpr auto INTRO_TEXT_COLOR = 15;
 constexpr auto MAX_ALIENS = 4;
 constexpr auto MAX_ALIEN_MISSILES = 20;
 constexpr auto MAX_HERO_MISSILES = 10;
-constexpr auto MAX_EXPLOSIONS = MAX_ALIENS + 1;			/* +1 for hero */
+constexpr auto MAX_EXPLOSIONS = MAX_ALIENS + 1;			// +1 for hero
 constexpr auto MAX_EXPLOSION_BITMAPS = 5;
 constexpr auto GUN_COLOR = 8;
 constexpr auto GUN_BLINK_RATE = 20;
@@ -38,7 +37,7 @@ constexpr auto ALIEN_X_VELOCITY = 3;
 constexpr auto ALIEN_Y_VELOCITY = 2;
 constexpr auto HERO_MISSILE_VELOCITY = 5;
 constexpr auto ALIEN_MISSILE_VELOCITY = 4;
-constexpr auto MAX_MOVE_STEP = 8;						/* max sprite movement (hero missile) */
+constexpr auto MAX_MOVE_STEP = 8;						// max sprite movement (hero missile)
 constexpr auto ALIEN_MOVE_TIME_VAR = 50;
 constexpr auto ALIEN_MOVE_TIME_BASE = 20;
 constexpr auto ALIEN_GEN_RATE_BASE = 40;
@@ -53,7 +52,7 @@ constexpr auto HERO_GUN_OFFSET_UP = 10;
 constexpr auto ALIEN_GUN_OFFSET_LEFT = 4;
 constexpr auto ALIEN_GUN_OFFSET_RIGHT = 25;
 constexpr auto ALIEN_GUN_OFFSET_DOWN = 20;
-constexpr auto DEATH_DELAY = 60;						/* 1 sec delay after player death */
+constexpr auto DEATH_DELAY = 60;						// 1 sec delay after player death
 constexpr auto POINTS_PER_ALIEN = 10;
 constexpr auto SHIELD_STATUS_WIDTH = 80;
 constexpr auto MAX_HERO_SHIELDS = SHIELD_STATUS_WIDTH - 1;
@@ -71,16 +70,19 @@ constexpr auto EXPLOSION_FRAME_REPEAT_COUNT = 3;
 constexpr auto HIGH_SCORE_TEXT_LEN = 20;
 constexpr auto HIGH_SCORE_FILENAME = "highscore.dat";
 constexpr auto HIGH_SCORE_COLOR = 2;
-constexpr auto TILE_WIDTH = 32;							/* in pixels */
+constexpr auto TILE_WIDTH = 32;							// in pixels
 constexpr auto TILE_HEIGHT = 32;
 constexpr auto NUM_TILES = 3;
 constexpr auto UPDATES_PER_SECOND = 60;
-/* screen parameters */
-constexpr auto SCREEN_WIDTH = 640;
-constexpr auto SCREEN_HEIGHT = 480;
+// screen parameters
+constexpr auto BUFFER_W = 320;
+constexpr auto BUFFER_H = 240;
+constexpr auto DISP_SCALE = 3;
+constexpr auto SCREEN_WIDTH = BUFFER_W * DISP_SCALE;
+constexpr auto SCREEN_HEIGHT = BUFFER_H * DISP_SCALE;
 constexpr auto STATUS_HEIGHT = 60;						// our hud is 60 pixels now 30 * 2 in 640x480 mode
 constexpr auto REDUCED_SCREEN_HEIGHT = SCREEN_HEIGHT - STATUS_HEIGHT;
-/* scrolling parameters */
+// scrolling parameters
 constexpr auto MAP_SCROLL_STEP_NORMAL = 1;
 constexpr auto MAP_SCROLL_STEP_FAST = 2;
 
@@ -88,7 +90,7 @@ constexpr auto MAP_SCROLL_STEP_FAST = 2;
 ALLEGRO_DISPLAY* disp = NULL;
 ALLEGRO_BITMAP* buffer = NULL;
 
-void must_init(bool test, const char * description)
+void must_init(bool test, const char* description)
 {
 	if (test) return;
 
@@ -101,8 +103,6 @@ void must_init(bool test, const char * description)
 
 long frames;
 long score;
-
-
 
 int between(int lo, int hi)
 {
@@ -124,24 +124,14 @@ bool collide(int ax1, int ay1, int ax2, int ay2, int bx1, int by1, int bx2, int 
 	return true;
 }
 
-
 // --- display ---
-
-constexpr auto BUFFER_W = 320;
-constexpr auto BUFFER_H = 240;
-
-constexpr auto DISP_SCALE = 3;
-constexpr auto DISP_W = BUFFER_W * DISP_SCALE;
-constexpr auto DISP_H = BUFFER_H * DISP_SCALE;
-
-
 
 void disp_init()
 {
 	al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
 	al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
 
-	disp = al_create_display(DISP_W, DISP_H);
+	disp = al_create_display(SCREEN_WIDTH, SCREEN_HEIGHT);
 	must_init(disp, "display");
 
 	buffer = al_create_bitmap(BUFFER_W, BUFFER_H);
@@ -162,7 +152,7 @@ void disp_pre_draw()
 void disp_post_draw()
 {
 	al_set_target_backbuffer(disp);
-	al_draw_scaled_bitmap(buffer, 0, 0, BUFFER_W, BUFFER_H, 0, 0, DISP_W, DISP_H, 0);
+	al_draw_scaled_bitmap(buffer, 0, 0, BUFFER_W, BUFFER_H, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
 	al_flip_display();
 }
@@ -200,9 +190,6 @@ void keyboard_update(ALLEGRO_EVENT* event)
 
 // --- sprites ---
 
-#define SHIP_W 12
-#define SHIP_H 13
-
 #define SHIP_SHOT_W 2
 #define SHIP_SHOT_H 9
 
@@ -228,9 +215,10 @@ const int ALIEN_H[] = { 9, 10, 27 };
 
 typedef struct SPRITES
 {
-	ALLEGRO_BITMAP* _sheet;
-
 	ALLEGRO_BITMAP* ship;
+	int ship_w;
+	int ship_h;
+
 	ALLEGRO_BITMAP* ship_shot[2];
 	ALLEGRO_BITMAP* life;
 
@@ -244,63 +232,55 @@ typedef struct SPRITES
 } SPRITES;
 SPRITES sprites;
 
-ALLEGRO_BITMAP* sprite_grab(int x, int y, int w, int h)
-{
-	ALLEGRO_BITMAP* sprite = al_create_sub_bitmap(sprites._sheet, x, y, w, h);
-	must_init(sprite, "sprite grab");
-	return sprite;
-}
-
 void sprites_init()
 {
-	sprites._sheet = al_load_bitmap("dat/gfx/spritesheet.png");
-	must_init(sprites._sheet, "spritesheet");
+	sprites.ship = al_load_bitmap("dat/gfx/hero.pcx");
+	must_init(sprites.ship, "dat/gfx/ship.png");
+	sprites.ship_w = al_get_bitmap_width(sprites.ship);
+	sprites.ship_h = al_get_bitmap_height(sprites.ship);
 
-	sprites.ship = sprite_grab(0, 0, SHIP_W, SHIP_H);
-	//al_save_bitmap("dat/save/ship.png", sprites.ship);
+	sprites.life = al_load_bitmap("dat/gfx/life.png");
+	must_init(sprites.life, "dat/gfx/life.png");
 
-	sprites.life = sprite_grab(0, 14, LIFE_W, LIFE_H);
-	//al_save_bitmap("dat/save/life.png", sprites.life);
+	sprites.ship_shot[0] = al_load_bitmap("dat/gfx/ship_shot0.png");
+	must_init(sprites.ship_shot[0], "dat/gfx/ship_shot0.png");
+	sprites.ship_shot[1] = al_load_bitmap("dat/gfx/ship_shot1.png");
+	must_init(sprites.ship_shot[1], "dat/gfx/ship_shot1.png");
 
-	sprites.ship_shot[0] = sprite_grab(13, 0, SHIP_SHOT_W, SHIP_SHOT_H);
-	//al_save_bitmap("dat/save/ship_shot0.png", sprites.ship_shot[0]);
-	sprites.ship_shot[1] = sprite_grab(16, 0, SHIP_SHOT_W, SHIP_SHOT_H);
-	//al_save_bitmap("dat/save/ship_shot1.png", sprites.ship_shot[1]);
+	sprites.alien[0] = al_load_bitmap("dat/gfx/alien_bug.png");
+	must_init(sprites.alien[0], "dat/gfx/alien_bug.png");
+	sprites.alien[1] = al_load_bitmap("dat/gfx/alien_arrow.png");
+	must_init(sprites.alien[1], "dat/gfx/alien_arrow.png");
+	sprites.alien[2] = al_load_bitmap("dat/gfx/alien_thiccboi.png");
+	must_init(sprites.alien[2], "dat/gfx/alien_thiccboi.png");
 
-	sprites.alien[0] = sprite_grab(19, 0, ALIEN_BUG_W, ALIEN_BUG_H);
-	//al_save_bitmap("dat/save/alien_bug.png", sprites.alien[0]);
-	sprites.alien[1] = sprite_grab(19, 10, ALIEN_ARROW_W, ALIEN_ARROW_H);
-	//al_save_bitmap("dat/save/alien_arrow.png", sprites.alien[1]);
-	sprites.alien[2] = sprite_grab(0, 21, ALIEN_THICCBOI_W, ALIEN_THICCBOI_H);
-	//al_save_bitmap("dat/save/alien_thiccboi.png", sprites.alien[2]);
+	sprites.alien_shot = al_load_bitmap("dat/gfx/alien_shot.png");
+	must_init(sprites.alien_shot, "dat/gfx/alien_shot.png");
 
-	sprites.alien_shot = sprite_grab(13, 10, ALIEN_SHOT_W, ALIEN_SHOT_H);
-	//al_save_bitmap("dat/save/alien_shot.png", sprites.alien_shot);
+	sprites.explosion[0] = al_load_bitmap("dat/gfx/explosion0.png");
+	must_init(sprites.explosion[0], "dat/gfx/explosion0.png");
+	sprites.explosion[1] = al_load_bitmap("dat/gfx/explosion1.png");
+	must_init(sprites.explosion[1], "dat/gfx/explosion1.png");
+	sprites.explosion[2] = al_load_bitmap("dat/gfx/explosion2.png");
+	must_init(sprites.explosion[2], "dat/gfx/explosion2.png");
+	sprites.explosion[3] = al_load_bitmap("dat/gfx/explosion3.png");
+	must_init(sprites.explosion[3], "dat/gfx/explosion3.png");
 
-	sprites.explosion[0] = sprite_grab(33, 10, 9, 9);
-	//al_save_bitmap("dat/save/explosion0.png", sprites.explosion[0]);
-	sprites.explosion[1] = sprite_grab(43, 9, 11, 11);
-	//al_save_bitmap("dat/save/explosion1.png", sprites.explosion[1]);
-	sprites.explosion[2] = sprite_grab(46, 21, 17, 18);
-	//al_save_bitmap("dat/save/explosion2.png", sprites.explosion[2]);
-	sprites.explosion[3] = sprite_grab(46, 40, 17, 17);
-	//al_save_bitmap("dat/save/explosion3.png", sprites.explosion[3]);
+	sprites.sparks[0] = al_load_bitmap("dat/gfx/sparks0.png");
+	must_init(sprites.sparks[0], "dat/gfx/sparks0.png");
+	sprites.sparks[1] = al_load_bitmap("dat/gfx/sparks1.png");
+	must_init(sprites.sparks[1], "dat/gfx/sparks1.png");
+	sprites.sparks[2] = al_load_bitmap("dat/gfx/sparks2.png");
+	must_init(sprites.sparks[2], "dat/gfx/sparks2.png");
 
-	sprites.sparks[0] = sprite_grab(34, 0, 10, 8);
-	//al_save_bitmap("dat/save/sparks0.png", sprites.sparks[0]);
-	sprites.sparks[1] = sprite_grab(45, 0, 7, 8);
-	//al_save_bitmap("dat/save/sparks1.png", sprites.sparks[1]);
-	sprites.sparks[2] = sprite_grab(54, 0, 9, 8);
-	//al_save_bitmap("dat/save/sparks2.png", sprites.sparks[2]);
-
-	sprites.powerup[0] = sprite_grab(0, 49, 9, 12);
-	//al_save_bitmap("dat/save/powerup0.png", sprites.powerup[0]);
-	sprites.powerup[1] = sprite_grab(10, 49, 9, 12);
-	//al_save_bitmap("dat/save/powerup1.png", sprites.powerup[1]);
-	sprites.powerup[2] = sprite_grab(20, 49, 9, 12);
-	//al_save_bitmap("dat/save/powerup2.png", sprites.powerup[2]);
-	sprites.powerup[3] = sprite_grab(30, 49, 9, 12);
-	//al_save_bitmap("dat/save/powerup3.png", sprites.powerup[3]);
+	sprites.powerup[0] = al_load_bitmap("dat/gfx/powerup0.png");
+	must_init(sprites.powerup[0], "dat/gfx/powerup0.png");
+	sprites.powerup[1] = al_load_bitmap("dat/gfx/powerup1.png");
+	must_init(sprites.powerup[1], "dat/gfx/powerup1.png");
+	sprites.powerup[2] = al_load_bitmap("dat/gfx/powerup2.png");
+	must_init(sprites.powerup[2], "dat/gfx/powerup2.png");
+	sprites.powerup[3] = al_load_bitmap("dat/gfx/powerup3.png");
+	must_init(sprites.powerup[3], "dat/gfx/powerup3.png");
 }
 
 void sprites_deinit()
@@ -327,8 +307,6 @@ void sprites_deinit()
 	al_destroy_bitmap(sprites.powerup[1]);
 	al_destroy_bitmap(sprites.powerup[2]);
 	al_destroy_bitmap(sprites.powerup[3]);
-
-	al_destroy_bitmap(sprites._sheet);
 }
 
 
@@ -606,12 +584,11 @@ void shots_draw()
 // --- ship ---
 
 #define SHIP_SPEED 3
-#define SHIP_MAX_X (BUFFER_W - SHIP_W)
-#define SHIP_MAX_Y (BUFFER_H - SHIP_H)
 
 typedef struct SHIP
 {
 	int x, y;
+	int ship_max_x, ship_max_y;
 	int shot_timer;
 	int lives;
 	int respawn_timer;
@@ -621,8 +598,10 @@ SHIP ship;
 
 void ship_init()
 {
-	ship.x = (BUFFER_W / 2) - (SHIP_W / 2);
-	ship.y = (BUFFER_H / 2) - (SHIP_H / 2);
+	ship.x = (BUFFER_W / 2) - (sprites.ship_w / 2);
+	ship.y = (BUFFER_H / 2) - (sprites.ship_h / 2);
+	ship.ship_max_x = BUFFER_W - sprites.ship_w;
+	ship.ship_max_y = BUFFER_H - sprites.ship_h;
 	ship.shot_timer = 0;
 	ship.lives = 3;
 	ship.respawn_timer = 0;
@@ -654,19 +633,17 @@ void ship_update()
 	if (ship.y < 0)
 		ship.y = 0;
 
-	if (ship.x > SHIP_MAX_X)
-		ship.x = SHIP_MAX_X;
-	if (ship.y > SHIP_MAX_Y)
-		ship.y = SHIP_MAX_Y;
+	if (ship.x > ship.ship_max_x) ship.x = ship.ship_max_x;
+	if (ship.y > ship.ship_max_y) ship.y = ship.ship_max_y;
 
 	if (ship.invincible_timer)
 		ship.invincible_timer--;
 	else
 	{
-		if (shots_collide(true, ship.x, ship.y, SHIP_W, SHIP_H))
+		if (shots_collide(true, ship.x, ship.y, sprites.ship_w, sprites.ship_h))
 		{
-			int x = ship.x + (SHIP_W / 2);
-			int y = ship.y + (SHIP_H / 2);
+			int x = ship.x + (sprites.ship_w / 2);
+			int y = ship.y + (sprites.ship_h / 2);
 			fx_add(false, x, y);
 			fx_add(false, x + 4, y + 2);
 			fx_add(false, x - 2, y - 4);
@@ -682,7 +659,7 @@ void ship_update()
 		ship.shot_timer--;
 	else if (key[ALLEGRO_KEY_X])
 	{
-		int x = ship.x + (SHIP_W / 2);
+		int x = ship.x + (sprites.ship_w / 2);
 		if (shots_add(true, false, x, ship.y))
 			ship.shot_timer = 5;
 	}
