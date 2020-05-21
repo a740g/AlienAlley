@@ -225,8 +225,8 @@ typedef struct SPRITES
 	ALLEGRO_BITMAP* alien[3];
 	ALLEGRO_BITMAP* alien_shot;
 
-	ALLEGRO_BITMAP* explosion[EXPLOSION_FRAMES];
-	ALLEGRO_BITMAP* sparks[SPARKS_FRAMES];
+	ALLEGRO_BITMAP* explosion;
+	ALLEGRO_BITMAP* sparks;
 
 	ALLEGRO_BITMAP* powerup[4];
 } SPRITES;
@@ -257,21 +257,11 @@ void sprites_init()
 	sprites.alien_shot = al_load_bitmap("dat/gfx/alien_shot.png");
 	must_init(sprites.alien_shot, "dat/gfx/alien_shot.png");
 
-	sprites.explosion[0] = al_load_bitmap("dat/gfx/explosion0.png");
-	must_init(sprites.explosion[0], "dat/gfx/explosion0.png");
-	sprites.explosion[1] = al_load_bitmap("dat/gfx/explosion1.png");
-	must_init(sprites.explosion[1], "dat/gfx/explosion1.png");
-	sprites.explosion[2] = al_load_bitmap("dat/gfx/explosion2.png");
-	must_init(sprites.explosion[2], "dat/gfx/explosion2.png");
-	sprites.explosion[3] = al_load_bitmap("dat/gfx/explosion3.png");
-	must_init(sprites.explosion[3], "dat/gfx/explosion3.png");
+	sprites.explosion = al_load_bitmap("dat/gfx/explosion1_ss.png");
+	must_init(sprites.explosion, "dat/gfx/explosion1_ss.png");
 
-	sprites.sparks[0] = al_load_bitmap("dat/gfx/sparks0.png");
-	must_init(sprites.sparks[0], "dat/gfx/sparks0.png");
-	sprites.sparks[1] = al_load_bitmap("dat/gfx/sparks1.png");
-	must_init(sprites.sparks[1], "dat/gfx/sparks1.png");
-	sprites.sparks[2] = al_load_bitmap("dat/gfx/sparks2.png");
-	must_init(sprites.sparks[2], "dat/gfx/sparks2.png");
+	sprites.sparks = al_load_bitmap("dat/gfx/sparks_ss.png");
+	must_init(sprites.sparks, "dat/gfx/sparks_ss.png");
 
 	sprites.powerup[0] = al_load_bitmap("dat/gfx/powerup0.png");
 	must_init(sprites.powerup[0], "dat/gfx/powerup0.png");
@@ -294,14 +284,9 @@ void sprites_deinit()
 	al_destroy_bitmap(sprites.alien[1]);
 	al_destroy_bitmap(sprites.alien[2]);
 
-	al_destroy_bitmap(sprites.sparks[0]);
-	al_destroy_bitmap(sprites.sparks[1]);
-	al_destroy_bitmap(sprites.sparks[2]);
+	al_destroy_bitmap(sprites.sparks);
 
-	al_destroy_bitmap(sprites.explosion[0]);
-	al_destroy_bitmap(sprites.explosion[1]);
-	al_destroy_bitmap(sprites.explosion[2]);
-	al_destroy_bitmap(sprites.explosion[3]);
+	al_destroy_bitmap(sprites.explosion);
 
 	al_destroy_bitmap(sprites.powerup[0]);
 	al_destroy_bitmap(sprites.powerup[1]);
@@ -400,15 +385,12 @@ void fx_draw()
 			continue;
 
 		int frame_display = fx[i].frame / 2;
-		ALLEGRO_BITMAP* bmp =
-			fx[i].spark
-			? sprites.sparks[frame_display]
-			: sprites.explosion[frame_display]
-			;
+		ALLEGRO_BITMAP* bmp = fx[i].spark ? sprites.sparks : sprites.explosion;
 
-		int x = fx[i].x - (al_get_bitmap_width(bmp) / 2);
-		int y = fx[i].y - (al_get_bitmap_height(bmp) / 2);
-		al_draw_bitmap(bmp, x, y, 0);
+		int frame_side_size = al_get_bitmap_height(bmp);	// since each fx frame width & height are the same
+		int x = fx[i].x - (frame_side_size / 2);
+		int y = fx[i].y - (frame_side_size / 2);
+		al_draw_bitmap_region(bmp, frame_display * frame_side_size, 0, frame_side_size, frame_side_size, x, y, 0);
 	}
 }
 
