@@ -234,7 +234,7 @@ SPRITES sprites;
 
 void sprites_init()
 {
-	sprites.ship = al_load_bitmap("dat/gfx/hero.pcx");
+	sprites.ship = al_load_bitmap("dat/gfx/hero.png");
 	must_init(sprites.ship, "dat/gfx/ship.png");
 	sprites.ship_w = al_get_bitmap_width(sprites.ship);
 	sprites.ship_h = al_get_bitmap_height(sprites.ship);
