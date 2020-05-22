@@ -105,7 +105,7 @@ int between(int lo, int hi)
 	return lo + (rand() % (hi - lo));
 }
 
-float between_f(float lo, float hi)
+float between(float lo, float hi)
 {
 	return lo + ((float)rand() / (float)RAND_MAX) * (hi - lo);
 }
@@ -170,9 +170,6 @@ void keyboard_update(ALLEGRO_EVENT* event)
 
 // --- sprites ---
 
-#define SHIP_SHOT_W 2
-#define SHIP_SHOT_H 9
-
 const int ALIEN_W[] = { 14, 13, 45 };
 const int ALIEN_H[] = { 9, 10, 27 };
 
@@ -197,6 +194,9 @@ typedef struct SPRITES
 	int ship_h;
 
 	ALLEGRO_BITMAP* ship_shot[2];
+	int ship_shot_w;
+	int ship_shot_h;
+
 	ALLEGRO_BITMAP* life;
 	int life_w;
 	int life_h;
@@ -227,6 +227,8 @@ void sprites_init()
 	must_init(sprites.ship_shot[0], "dat/gfx/hero_shot0.png");
 	sprites.ship_shot[1] = al_load_bitmap("dat/gfx/hero_shot1.png");
 	must_init(sprites.ship_shot[1], "dat/gfx/hero_shot1.png");
+	sprites.ship_shot_w = al_get_bitmap_width(sprites.ship_shot[0]);
+	sprites.ship_shot_h = al_get_bitmap_height(sprites.ship_shot[1]);
 
 	sprites.alien[0] = al_load_bitmap("dat/gfx/alien_bug.png");
 	must_init(sprites.alien[0], "dat/gfx/alien_bug.png");
@@ -271,8 +273,15 @@ void sprites_deinit()
 
 ALLEGRO_SAMPLE* sample_shot;
 ALLEGRO_SAMPLE* sample_explode[2];
+ALLEGRO_AUDIO_STREAM* music;
 
-void audio_init()
+
+/*
+	Function: AudioInitialize
+	Description:
+		Loads audio effects & music
+*/
+void AudioInitialize()
 {
 	al_install_audio();
 	al_init_acodec_addon();
@@ -285,13 +294,24 @@ void audio_init()
 	must_init(sample_explode[0], "dat/snd/sfx/alien_explosion_small.flac");
 	sample_explode[1] = al_load_sample("dat/snd/sfx/alien_explosion_big.flac");
 	must_init(sample_explode[1], "dat/snd/sfx/alien_explosion_big.flac");
+
+	music = al_load_audio_stream("dat/snd/mus/alien_main.opus", 2, 2048);
+	must_init(music, "music");
+	al_set_audio_stream_playmode(music, ALLEGRO_PLAYMODE_LOOP);
+	al_attach_audio_stream_to_mixer(music, al_get_default_mixer());
 }
 
-void audio_deinit()
+/*
+	Function: AudioFinalize
+	Description:
+		Unloads audio effects & music
+*/
+void AudioFinalize()
 {
 	al_destroy_sample(sample_shot);
 	al_destroy_sample(sample_explode[0]);
 	al_destroy_sample(sample_explode[1]);
+	al_destroy_audio_stream(music);
 }
 
 
@@ -392,7 +412,7 @@ bool shots_add(bool ship, bool straight, int x, int y)
 		sample_shot,
 		0.3,
 		0,
-		ship ? 1.0 : between_f(1.5, 1.6),
+		ship ? 1.0 : between(1.5f, 1.6f),
 		ALLEGRO_PLAYMODE_ONCE,
 		NULL
 	);
@@ -406,7 +426,7 @@ bool shots_add(bool ship, bool straight, int x, int y)
 
 		if (ship)
 		{
-			shots[i].x = x - (SHIP_SHOT_W / 2);
+			shots[i].x = x - (sprites.ship_shot_w / 2);
 			shots[i].y = y;
 		}
 		else // alien
@@ -452,7 +472,7 @@ void shots_update()
 		{
 			shots[i].y -= 5;
 
-			if (shots[i].y < -SHIP_SHOT_H)
+			if (shots[i].y < -(sprites.ship_shot_h))
 			{
 				shots[i].used = false;
 				continue;
@@ -496,8 +516,8 @@ bool shots_collide(bool ship, int x, int y, int w, int h)
 		}
 		else
 		{
-			sw = SHIP_SHOT_W;
-			sh = SHIP_SHOT_H;
+			sw = sprites.ship_shot_w;
+			sh = sprites.ship_shot_h;
 		}
 
 		if (collide(x, y, x + w, y + h, shots[i].x, shots[i].y, shots[i].x + sw, shots[i].y + sh))
@@ -823,8 +843,8 @@ void stars_init()
 {
 	for (int i = 0; i < STARS_N; i++)
 	{
-		stars[i].y = between_f(0, screen_width);
-		stars[i].speed = between_f(0.1, 1);
+		stars[i].y = between(0.0f, (float)screen_width);
+		stars[i].speed = between(0.1f, 1.0f);
 	}
 }
 
@@ -836,7 +856,7 @@ void stars_update()
 		if (stars[i].y >= screen_width)
 		{
 			stars[i].y = 0;
-			stars[i].speed = between_f(0.1, 1);
+			stars[i].speed = between(0.1f, 1.0f);
 		}
 	}
 }
@@ -928,7 +948,7 @@ int main()
 
 	disp_init();
 
-	audio_init();
+	AudioInitialize();
 
 	must_init(al_init_image_addon(), "image");
 	sprites_init();
@@ -1011,7 +1031,7 @@ int main()
 
 	sprites_deinit();
 	hud_deinit();
-	audio_deinit();
+	AudioFinalize();
 	disp_deinit();
 	al_destroy_timer(timer);
 	al_destroy_event_queue(queue);
@@ -1664,39 +1684,10 @@ r.b.x = IIf(r1.b.x < r2.b.x, r1.b.x, r2.b.x)
 	End Sub
 
 
-	/*
-		Function: InitSound
-		Description:
-			Initialize sound stuff.
-	*/
-	Sub SoundInitialize()
-	/* load the sound effects */
-	ExplosionSound = load_sample(ExePath & "/dat/snd/explode.wav")
-	LaserSound = load_sample(ExePath & "/dat/snd/laser.wav")
-	End Sub
 
 
-	/*
-		Function: DeInitSound
-		Description:
-			Unloads both MidPak and DigPak.
-	*/
-	Sub SoundFinalize()
-	If(ExplosionSound <> NULL) Then
-	destroy_sample(ExplosionSound)
-	ExplosionSound = NULL
-	End If
 
-	If(LaserSound <> NULL) Then
-	destroy_sample(LaserSound)
-	LaserSound = NULL
-	End If
 
-	If(GameMusic <> NULL) Then
-	destroy_midi(GameMusic)
-	GameMusic = NULL
-	End If
-	End Sub
 
 
 	/*
