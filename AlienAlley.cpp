@@ -75,20 +75,16 @@ constexpr auto TILE_HEIGHT = 32;
 constexpr auto NUM_TILES = 3;
 constexpr auto UPDATES_PER_SECOND = 60;
 // screen parameters
-constexpr auto BUFFER_W = 640;
-constexpr auto BUFFER_H = 480;
-constexpr auto DISP_SCALE = 2;
-constexpr auto SCREEN_WIDTH = BUFFER_W * DISP_SCALE;
-constexpr auto SCREEN_HEIGHT = BUFFER_H * DISP_SCALE;
 constexpr auto STATUS_HEIGHT = 60;						// our hud is 60 pixels now 30 * 2 in 640x480 mode
-constexpr auto REDUCED_SCREEN_HEIGHT = SCREEN_HEIGHT - STATUS_HEIGHT;
 // scrolling parameters
 constexpr auto MAP_SCROLL_STEP_NORMAL = 1;
 constexpr auto MAP_SCROLL_STEP_FAST = 2;
 
 // These are out global variables
 ALLEGRO_DISPLAY* disp = NULL;
-ALLEGRO_BITMAP* buffer = NULL;
+int screen_width = 640;
+int screen_height = 480;
+
 
 void must_init(bool test, const char* description)
 {
@@ -130,33 +126,17 @@ void disp_init()
 {
 	al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
 	al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
-
-	disp = al_create_display(SCREEN_WIDTH, SCREEN_HEIGHT);
+	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_FRAMELESS);
+	disp = al_create_display(screen_width, screen_height);
 	must_init(disp, "display");
-
-	buffer = al_create_bitmap(BUFFER_W, BUFFER_H);
-	must_init(buffer, "bitmap buffer");
+	screen_width = al_get_display_width(disp);
+	screen_height = al_get_display_height(disp);
 }
 
 void disp_deinit()
 {
-	al_destroy_bitmap(buffer);
 	al_destroy_display(disp);
 }
-
-void disp_pre_draw()
-{
-	al_set_target_bitmap(buffer);
-}
-
-void disp_post_draw()
-{
-	al_set_target_backbuffer(disp);
-	al_draw_scaled_bitmap(buffer, 0, 0, BUFFER_W, BUFFER_H, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-
-	al_flip_display();
-}
-
 
 // --- keyboard ---
 
@@ -234,7 +214,7 @@ SPRITES sprites;
 void sprites_init()
 {
 	sprites.ship = al_load_bitmap("dat/gfx/hero.png");
-	must_init(sprites.ship, "dat/gfx/ship.png");
+	must_init(sprites.ship, "dat/gfx/hero.png");
 	sprites.ship_w = al_get_bitmap_width(sprites.ship);
 	sprites.ship_h = al_get_bitmap_height(sprites.ship);
 
@@ -243,10 +223,10 @@ void sprites_init()
 	sprites.life_w = al_get_bitmap_width(sprites.life);
 	sprites.life_h = al_get_bitmap_height(sprites.life);
 
-	sprites.ship_shot[0] = al_load_bitmap("dat/gfx/ship_shot0.png");
-	must_init(sprites.ship_shot[0], "dat/gfx/ship_shot0.png");
-	sprites.ship_shot[1] = al_load_bitmap("dat/gfx/ship_shot1.png");
-	must_init(sprites.ship_shot[1], "dat/gfx/ship_shot1.png");
+	sprites.ship_shot[0] = al_load_bitmap("dat/gfx/hero_shot0.png");
+	must_init(sprites.ship_shot[0], "dat/gfx/hero_shot0.png");
+	sprites.ship_shot[1] = al_load_bitmap("dat/gfx/hero_shot1.png");
+	must_init(sprites.ship_shot[1], "dat/gfx/hero_shot1.png");
 
 	sprites.alien[0] = al_load_bitmap("dat/gfx/alien_bug.png");
 	must_init(sprites.alien[0], "dat/gfx/alien_bug.png");
@@ -258,8 +238,8 @@ void sprites_init()
 	sprites.alien_shot = al_load_bitmap("dat/gfx/alien_shot.png");
 	must_init(sprites.alien_shot, "dat/gfx/alien_shot.png");
 
-	sprites.explosion = al_load_bitmap("dat/gfx/explosion2_ss.png");
-	must_init(sprites.explosion, "dat/gfx/explosion2_ss.png");
+	sprites.explosion = al_load_bitmap("dat/gfx/explosion_small_ss.png");
+	must_init(sprites.explosion, "dat/gfx/explosion_small_ss.png");
 
 	sprites.sparks = al_load_bitmap("dat/gfx/sparks_ss.png");
 	must_init(sprites.sparks, "dat/gfx/sparks_ss.png");
@@ -298,13 +278,13 @@ void audio_init()
 	al_init_acodec_addon();
 	al_reserve_samples(128);
 
-	sample_shot = al_load_sample("dat/snd/sfx/shot.flac");
-	must_init(sample_shot, "shot sample");
+	sample_shot = al_load_sample("dat/snd/sfx/alien_shot.flac");
+	must_init(sample_shot, "dat/snd/sfx/alien_shot.flac");
 
-	sample_explode[0] = al_load_sample("dat/snd/sfx/explode1.flac");
-	must_init(sample_explode[0], "explode[0] sample");
-	sample_explode[1] = al_load_sample("dat/snd/sfx/explode2.flac");
-	must_init(sample_explode[1], "explode[1] sample");
+	sample_explode[0] = al_load_sample("dat/snd/sfx/alien_explosion_small.flac");
+	must_init(sample_explode[0], "dat/snd/sfx/alien_explosion_small.flac");
+	sample_explode[1] = al_load_sample("dat/snd/sfx/alien_explosion_big.flac");
+	must_init(sample_explode[1], "dat/snd/sfx/alien_explosion_big.flac");
 }
 
 void audio_deinit()
@@ -484,9 +464,9 @@ void shots_update()
 			shots[i].y += shots[i].dy;
 
 			if ((shots[i].x < -ALIEN_SHOT_W)
-				|| (shots[i].x > BUFFER_W)
+				|| (shots[i].x > screen_width)
 				|| (shots[i].y < -ALIEN_SHOT_H)
-				|| (shots[i].y > BUFFER_H)
+				|| (shots[i].y > screen_height)
 				) {
 				shots[i].used = false;
 				continue;
@@ -572,10 +552,10 @@ SHIP ship;
 
 void ship_init()
 {
-	ship.x = (BUFFER_W / 2) - (sprites.ship_w / 2);
-	ship.y = (BUFFER_H / 2) - (sprites.ship_h / 2);
-	ship.ship_max_x = BUFFER_W - sprites.ship_w;
-	ship.ship_max_y = BUFFER_H - sprites.ship_h;
+	ship.x = (screen_width / 2) - (sprites.ship_w / 2);
+	ship.y = (screen_height / 2) - (sprites.ship_h / 2);
+	ship.ship_max_x = screen_width - sprites.ship_w;
+	ship.ship_max_y = screen_height - sprites.ship_h;
 	ship.shot_timer = 0;
 	ship.lives = 3;
 	ship.respawn_timer = 0;
@@ -688,7 +668,7 @@ void aliens_update()
 		? 0
 		: between(2, 4)
 		;
-	int new_x = between(10, BUFFER_W - 50);
+	int new_x = between(10, screen_width - 50);
 
 	for (int i = 0; i < ALIENS_N; i++)
 	{
@@ -698,8 +678,8 @@ void aliens_update()
 			if (new_quota > 0)
 			{
 				new_x += between(40, 80);
-				if (new_x > (BUFFER_W - 60))
-					new_x -= (BUFFER_W - 60);
+				if (new_x > (screen_width - 60))
+					new_x -= (screen_width - 60);
 
 				aliens[i].x = new_x;
 
@@ -744,7 +724,7 @@ void aliens_update()
 			break;
 		}
 
-		if (aliens[i].y >= BUFFER_H)
+		if (aliens[i].y >= screen_width)
 		{
 			aliens[i].used = false;
 			continue;
@@ -835,14 +815,15 @@ typedef struct STAR
 	float speed;
 } STAR;
 
-#define STARS_N ((BUFFER_W / 2) - 1)
+//#define STARS_N ((screen_width / 2) - 1)
+#define STARS_N ((640 / 2) - 1)
 STAR stars[STARS_N];
 
 void stars_init()
 {
 	for (int i = 0; i < STARS_N; i++)
 	{
-		stars[i].y = between_f(0, BUFFER_H);
+		stars[i].y = between_f(0, screen_width);
 		stars[i].speed = between_f(0.1, 1);
 	}
 }
@@ -852,7 +833,7 @@ void stars_update()
 	for (int i = 0; i < STARS_N; i++)
 	{
 		stars[i].y += stars[i].speed;
-		if (stars[i].y >= BUFFER_H)
+		if (stars[i].y >= screen_width)
 		{
 			stars[i].y = 0;
 			stars[i].speed = between_f(0.1, 1);
@@ -922,7 +903,7 @@ void hud_draw()
 		al_draw_text(
 			font,
 			al_map_rgb_f(1, 1, 1),
-			BUFFER_W / 2, BUFFER_H / 2,
+			screen_width / 2, screen_height / 2,
 			ALLEGRO_ALIGN_CENTER,
 			"G A M E  O V E R"
 		);
@@ -1013,7 +994,6 @@ int main()
 
 		if (redraw && al_is_event_queue_empty(queue))
 		{
-			disp_pre_draw();
 			al_clear_to_color(al_map_rgb(0, 0, 0));
 
 			stars_draw();
@@ -1024,7 +1004,7 @@ int main()
 
 			hud_draw();
 
-			disp_post_draw();
+			al_flip_display();
 			redraw = false;
 		}
 	}
