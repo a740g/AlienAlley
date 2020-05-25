@@ -11,7 +11,6 @@
 |														   |
 \*--------------------------------------------------------*/
 
-// All header files that we need
 #include <stdio.h>
 #include <stdlib.h>
 #include <allegro5/allegro5.h>
@@ -22,7 +21,6 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_native_dialog.h>
 
-// Constants
 constexpr auto INTRO_TEXT_COLOR = 15;
 constexpr auto MAX_ALIENS = 4;
 constexpr auto MAX_ALIEN_MISSILES = 20;
@@ -74,19 +72,137 @@ constexpr auto TILE_WIDTH = 32;							// in pixels
 constexpr auto TILE_HEIGHT = 32;
 constexpr auto NUM_TILES = 3;
 constexpr auto UPDATES_PER_SECOND = 60;
-// screen parameters
 constexpr auto STATUS_HEIGHT = 60;						// our hud is 60 pixels now 30 * 2 in 640x480 mode
-// scrolling parameters
-constexpr auto MAP_SCROLL_STEP_NORMAL = 1;
+constexpr auto MAP_SCROLL_STEP_NORMAL = 1;				// scrolling parameters
 constexpr auto MAP_SCROLL_STEP_FAST = 2;
+constexpr auto KEY_SEEN = 1;							// Key see and released flags
+constexpr auto KEY_RELEASED = 2;
 
-// These are out global variables
-ALLEGRO_DISPLAY* disp = NULL;
-int screen_width = 640;
-int screen_height = 480;
+#define EXPLOSION_FRAMES 5
+#define SPARKS_FRAMES    3
+//#define STARS_N ((screen_width / 2) - 1)
+#define STARS_N ((640 / 2) - 1)
+#define FX_N 128
+#define SHOTS_N 128
+#define SHIP_SPEED 3
+#define ALIENS_N 16
 
+// Types of aliens
+enum ALIEN_TYPE_T
+{
+	ALIEN_TYPE_BUG = 0,
+	ALIEN_TYPE_ARROW,
+	ALIEN_TYPE_THICCBOI,
+	ALIEN_TYPE_N
+};
 
-void must_init(bool test, const char* description)
+// Absolute X, Y
+struct POINT_T
+{
+	int x;
+	int y;
+};
+
+// Rectangle
+struct RECT_T
+{
+	POINT_T a;
+	POINT_T b;
+};
+
+// Rectange dimension
+struct DIM_T
+{
+	int w;
+	int h;
+};
+
+struct SPRITES_T
+{
+	ALLEGRO_BITMAP* ship;
+	DIM_T ship_d;
+
+	ALLEGRO_BITMAP* ship_shot[2];
+	DIM_T ship_shot_d;
+
+	ALLEGRO_BITMAP* life;
+	DIM_T life_d;
+
+	ALLEGRO_BITMAP* alien[ALIEN_TYPE_N];
+	DIM_T alien_d[ALIEN_TYPE_N];
+
+	ALLEGRO_BITMAP* alien_shot;
+	DIM_T alien_shot_d;
+
+	ALLEGRO_BITMAP* explosion;
+	ALLEGRO_BITMAP* sparks;
+
+	ALLEGRO_BITMAP* powerup;
+};
+
+struct STAR_T
+{
+	float y;
+	float speed;
+};
+
+struct FX_T
+{
+	int x, y;
+	int frame;
+	bool spark;
+	bool used;
+};
+
+struct SHOT_T
+{
+	int x, y, dx, dy;
+	int frame;
+	bool ship;
+	bool used;
+};
+
+struct SHIP_T
+{
+	int x, y;
+	int ship_max_x, ship_max_y;
+	int shot_timer;
+	int lives;
+	int respawn_timer;
+	int invincible_timer;
+};
+
+struct ALIEN_T
+{
+	int x, y;
+	ALIEN_TYPE_T type;
+	int shot_timer;
+	int blink;
+	int life;
+	bool used;
+};
+
+unsigned char key[ALLEGRO_KEY_MAX];						// Key state array
+ALLEGRO_DISPLAY* disp = NULL;							// Allegro display
+int screen_width = 640;									// Screen width - this is updated later
+int screen_height = 480;								// Screen height - this is updated later
+long frames;											// How many frame did we render?
+long score;												// What is the player score?
+ALLEGRO_SAMPLE* sample_shot;
+ALLEGRO_SAMPLE* sample_explode[2];
+ALLEGRO_AUDIO_STREAM* music;
+ALLEGRO_FONT* font;
+long score_display;
+SPRITES_T sprites;
+STAR_T stars[STARS_N];
+FX_T fx[FX_N];
+SHOT_T shots[SHOTS_N];
+SHIP_T ship;
+ALIEN_T aliens[ALIENS_N];
+
+// Check if a Allegro/pogram initialization succeeded
+// If not, it just ends with EXIT_FAILURE
+void InitializeCheck(bool test, const char* description)
 {
 	if (test) return;
 
@@ -97,9 +213,6 @@ void must_init(bool test, const char* description)
 
 // --- general ---
 
-long frames;
-long score;
-
 int between(int lo, int hi)
 {
 	return lo + (rand() % (hi - lo));
@@ -109,6 +222,22 @@ float between(float lo, float hi)
 {
 	return lo + ((float)rand() / (float)RAND_MAX) * (hi - lo);
 }
+
+
+/*
+	Function: BoundingRectCompute
+	Description:
+		Calculates the bounding rectangle for a sprite given its
+		position, width and height.
+*/
+void BoundingRectCompute(const POINT_T* p, const DIM_T* d, RECT_T* r)
+{
+	r->a.x = p->x;
+	r->a.y = p->y;
+	r->b.x = r->a.x + d->w - 1;
+	r->b.y = r->a.y + d->h - 1;
+}
+
 
 bool collide(int ax1, int ay1, int ax2, int ay2, int bx1, int by1, int bx2, int by2)
 {
@@ -128,7 +257,7 @@ void disp_init()
 	al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
 	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_FRAMELESS);
 	disp = al_create_display(screen_width, screen_height);
-	must_init(disp, "display");
+	InitializeCheck(disp, "display");
 	screen_width = al_get_display_width(disp);
 	screen_height = al_get_display_height(disp);
 }
@@ -139,10 +268,6 @@ void disp_deinit()
 }
 
 // --- keyboard ---
-
-#define KEY_SEEN     1
-#define KEY_RELEASED 2
-unsigned char key[ALLEGRO_KEY_MAX];
 
 void keyboard_init()
 {
@@ -167,87 +292,55 @@ void keyboard_update(ALLEGRO_EVENT* event)
 	}
 }
 
-
 // --- sprites ---
-
-const int ALIEN_W[] = { 14, 13, 45 };
-const int ALIEN_H[] = { 9, 10, 27 };
-
-#define ALIEN_BUG_W      ALIEN_W[0]
-#define ALIEN_BUG_H      ALIEN_H[0]
-#define ALIEN_ARROW_W    ALIEN_W[1]
-#define ALIEN_ARROW_H    ALIEN_H[1]
-#define ALIEN_THICCBOI_W ALIEN_W[2]
-#define ALIEN_THICCBOI_H ALIEN_H[2]
-
-#define ALIEN_SHOT_W 4
-#define ALIEN_SHOT_H 4
-
-#define EXPLOSION_FRAMES 5
-#define SPARKS_FRAMES    3
-
-
-typedef struct SPRITES
-{
-	ALLEGRO_BITMAP* ship;
-	int ship_w;
-	int ship_h;
-
-	ALLEGRO_BITMAP* ship_shot[2];
-	int ship_shot_w;
-	int ship_shot_h;
-
-	ALLEGRO_BITMAP* life;
-	int life_w;
-	int life_h;
-
-	ALLEGRO_BITMAP* alien[3];
-	ALLEGRO_BITMAP* alien_shot;
-
-	ALLEGRO_BITMAP* explosion;
-	ALLEGRO_BITMAP* sparks;
-
-	ALLEGRO_BITMAP* powerup;
-} SPRITES;
-SPRITES sprites;
 
 void sprites_init()
 {
 	sprites.ship = al_load_bitmap("dat/gfx/hero.png");
-	must_init(sprites.ship, "dat/gfx/hero.png");
-	sprites.ship_w = al_get_bitmap_width(sprites.ship);
-	sprites.ship_h = al_get_bitmap_height(sprites.ship);
+	InitializeCheck(sprites.ship, "dat/gfx/hero.png");
+	sprites.ship_d.w = al_get_bitmap_width(sprites.ship);
+	sprites.ship_d.h = al_get_bitmap_height(sprites.ship);
 
 	sprites.life = al_load_bitmap("dat/gfx/life.png");
-	must_init(sprites.life, "dat/gfx/life.png");
-	sprites.life_w = al_get_bitmap_width(sprites.life);
-	sprites.life_h = al_get_bitmap_height(sprites.life);
+	InitializeCheck(sprites.life, "dat/gfx/life.png");
+	sprites.life_d.w = al_get_bitmap_width(sprites.life);
+	sprites.life_d.h = al_get_bitmap_height(sprites.life);
 
 	sprites.ship_shot[0] = al_load_bitmap("dat/gfx/hero_shot0.png");
-	must_init(sprites.ship_shot[0], "dat/gfx/hero_shot0.png");
+	InitializeCheck(sprites.ship_shot[0], "dat/gfx/hero_shot0.png");
 	sprites.ship_shot[1] = al_load_bitmap("dat/gfx/hero_shot1.png");
-	must_init(sprites.ship_shot[1], "dat/gfx/hero_shot1.png");
-	sprites.ship_shot_w = al_get_bitmap_width(sprites.ship_shot[0]);
-	sprites.ship_shot_h = al_get_bitmap_height(sprites.ship_shot[1]);
+	InitializeCheck(sprites.ship_shot[1], "dat/gfx/hero_shot1.png");
+	sprites.ship_shot_d.w = al_get_bitmap_width(sprites.ship_shot[0]);
+	sprites.ship_shot_d.h = al_get_bitmap_height(sprites.ship_shot[1]);
 
 	sprites.alien[0] = al_load_bitmap("dat/gfx/alien_bug.png");
-	must_init(sprites.alien[0], "dat/gfx/alien_bug.png");
+	InitializeCheck(sprites.alien[0], "dat/gfx/alien_bug.png");
+	sprites.alien_d[0].w = al_get_bitmap_width(sprites.alien[0]);
+	sprites.alien_d[0].h = al_get_bitmap_height(sprites.alien[0]);
+
 	sprites.alien[1] = al_load_bitmap("dat/gfx/alien_arrow.png");
-	must_init(sprites.alien[1], "dat/gfx/alien_arrow.png");
+	InitializeCheck(sprites.alien[1], "dat/gfx/alien_arrow.png");
+	sprites.alien_d[1].w = al_get_bitmap_width(sprites.alien[1]);
+	sprites.alien_d[1].h = al_get_bitmap_height(sprites.alien[1]);
+
 	sprites.alien[2] = al_load_bitmap("dat/gfx/alien_thiccboi.png");
-	must_init(sprites.alien[2], "dat/gfx/alien_thiccboi.png");
+	InitializeCheck(sprites.alien[2], "dat/gfx/alien_thiccboi.png");
+	sprites.alien_d[2].w = al_get_bitmap_width(sprites.alien[2]);
+	sprites.alien_d[2].h = al_get_bitmap_height(sprites.alien[2]);
 
 	sprites.alien_shot = al_load_bitmap("dat/gfx/alien_shot.png");
-	must_init(sprites.alien_shot, "dat/gfx/alien_shot.png");
+	InitializeCheck(sprites.alien_shot, "dat/gfx/alien_shot.png");
+	sprites.alien_shot_d.w = al_get_bitmap_width(sprites.alien_shot);
+	sprites.alien_shot_d.h = al_get_bitmap_height(sprites.alien_shot);
 
 	sprites.explosion = al_load_bitmap("dat/gfx/explosion_small_ss.png");
-	must_init(sprites.explosion, "dat/gfx/explosion_small_ss.png");
+	InitializeCheck(sprites.explosion, "dat/gfx/explosion_small_ss.png");
 
 	sprites.sparks = al_load_bitmap("dat/gfx/sparks_ss.png");
-	must_init(sprites.sparks, "dat/gfx/sparks_ss.png");
+	InitializeCheck(sprites.sparks, "dat/gfx/sparks_ss.png");
 
 	sprites.powerup = al_load_bitmap("dat/gfx/powerup_ss.png");
-	must_init(sprites.powerup, "dat/gfx/powerup_ss.png");
+	InitializeCheck(sprites.powerup, "dat/gfx/powerup_ss.png");
 }
 
 void sprites_deinit()
@@ -268,13 +361,7 @@ void sprites_deinit()
 	al_destroy_bitmap(sprites.powerup);
 }
 
-
 // --- audio ---
-
-ALLEGRO_SAMPLE* sample_shot;
-ALLEGRO_SAMPLE* sample_explode[2];
-ALLEGRO_AUDIO_STREAM* music;
-
 
 /*
 	Function: AudioInitialize
@@ -288,15 +375,15 @@ void AudioInitialize()
 	al_reserve_samples(128);
 
 	sample_shot = al_load_sample("dat/snd/sfx/alien_shot.flac");
-	must_init(sample_shot, "dat/snd/sfx/alien_shot.flac");
+	InitializeCheck(sample_shot, "dat/snd/sfx/alien_shot.flac");
 
 	sample_explode[0] = al_load_sample("dat/snd/sfx/alien_explosion_small.flac");
-	must_init(sample_explode[0], "dat/snd/sfx/alien_explosion_small.flac");
+	InitializeCheck(sample_explode[0], "dat/snd/sfx/alien_explosion_small.flac");
 	sample_explode[1] = al_load_sample("dat/snd/sfx/alien_explosion_big.flac");
-	must_init(sample_explode[1], "dat/snd/sfx/alien_explosion_big.flac");
+	InitializeCheck(sample_explode[1], "dat/snd/sfx/alien_explosion_big.flac");
 
 	music = al_load_audio_stream("dat/snd/mus/alien_main.opus", 2, 2048);
-	must_init(music, "music");
+	InitializeCheck(music, "music");
 	al_set_audio_stream_playmode(music, ALLEGRO_PLAYMODE_LOOP);
 	al_attach_audio_stream_to_mixer(music, al_get_default_mixer());
 }
@@ -314,19 +401,7 @@ void AudioFinalize()
 	al_destroy_audio_stream(music);
 }
 
-
 // --- fx ---
-
-typedef struct FX
-{
-	int x, y;
-	int frame;
-	bool spark;
-	bool used;
-} FX;
-
-#define FX_N 128
-FX fx[FX_N];
 
 void fx_init()
 {
@@ -386,19 +461,7 @@ void fx_draw()
 	}
 }
 
-
 // --- shots ---
-
-typedef struct SHOT
-{
-	int x, y, dx, dy;
-	int frame;
-	bool ship;
-	bool used;
-} SHOT;
-
-#define SHOTS_N 128
-SHOT shots[SHOTS_N];
 
 void shots_init()
 {
@@ -406,13 +469,13 @@ void shots_init()
 		shots[i].used = false;
 }
 
-bool shots_add(bool ship, bool straight, int x, int y)
+bool shots_add(bool is_ship, bool straight, int x, int y)
 {
 	al_play_sample(
 		sample_shot,
 		0.3,
 		0,
-		ship ? 1.0 : between(1.5f, 1.6f),
+		is_ship ? 1.0 : between(1.5f, 1.6f),
 		ALLEGRO_PLAYMODE_ONCE,
 		NULL
 	);
@@ -422,17 +485,17 @@ bool shots_add(bool ship, bool straight, int x, int y)
 		if (shots[i].used)
 			continue;
 
-		shots[i].ship = ship;
+		shots[i].ship = is_ship;
 
-		if (ship)
+		if (is_ship)
 		{
-			shots[i].x = x - (sprites.ship_shot_w / 2);
+			shots[i].x = x - (sprites.ship_shot_d.w / 2);
 			shots[i].y = y;
 		}
 		else // alien
 		{
-			shots[i].x = x - (ALIEN_SHOT_W / 2);
-			shots[i].y = y - (ALIEN_SHOT_H / 2);
+			shots[i].x = x - (sprites.alien_shot_d.w / 2);
+			shots[i].y = y - (sprites.alien_shot_d.h / 2);
 
 			if (straight)
 			{
@@ -472,7 +535,7 @@ void shots_update()
 		{
 			shots[i].y -= 5;
 
-			if (shots[i].y < -(sprites.ship_shot_h))
+			if (shots[i].y < -(sprites.ship_shot_d.h))
 			{
 				shots[i].used = false;
 				continue;
@@ -483,9 +546,9 @@ void shots_update()
 			shots[i].x += shots[i].dx;
 			shots[i].y += shots[i].dy;
 
-			if ((shots[i].x < -ALIEN_SHOT_W)
+			if ((shots[i].x < -(sprites.alien_shot_d.w))
 				|| (shots[i].x > screen_width)
-				|| (shots[i].y < -ALIEN_SHOT_H)
+				|| (shots[i].y < -(sprites.alien_shot_d.h))
 				|| (shots[i].y > screen_height)
 				) {
 				shots[i].used = false;
@@ -497,7 +560,7 @@ void shots_update()
 	}
 }
 
-bool shots_collide(bool ship, int x, int y, int w, int h)
+bool shots_collide(bool is_ship, int x, int y, int w, int h)
 {
 	for (int i = 0; i < SHOTS_N; i++)
 	{
@@ -505,19 +568,19 @@ bool shots_collide(bool ship, int x, int y, int w, int h)
 			continue;
 
 		// don't collide with one's own shots
-		if (shots[i].ship == ship)
+		if (shots[i].ship == is_ship)
 			continue;
 
 		int sw, sh;
-		if (ship)
+		if (is_ship)
 		{
-			sw = ALIEN_SHOT_W;
-			sh = ALIEN_SHOT_H;
+			sw = sprites.alien_shot_d.w;
+			sh = sprites.alien_shot_d.h;
 		}
 		else
 		{
-			sw = sprites.ship_shot_w;
-			sh = sprites.ship_shot_h;
+			sw = sprites.ship_shot_d.w;
+			sh = sprites.ship_shot_d.h;
 		}
 
 		if (collide(x, y, x + w, y + h, shots[i].x, shots[i].y, shots[i].x + sw, shots[i].y + sh))
@@ -554,28 +617,14 @@ void shots_draw()
 	}
 }
 
-
 // --- ship ---
-
-#define SHIP_SPEED 3
-
-typedef struct SHIP
-{
-	int x, y;
-	int ship_max_x, ship_max_y;
-	int shot_timer;
-	int lives;
-	int respawn_timer;
-	int invincible_timer;
-} SHIP;
-SHIP ship;
 
 void ship_init()
 {
-	ship.x = (screen_width / 2) - (sprites.ship_w / 2);
-	ship.y = (screen_height / 2) - (sprites.ship_h / 2);
-	ship.ship_max_x = screen_width - sprites.ship_w;
-	ship.ship_max_y = screen_height - sprites.ship_h;
+	ship.x = (screen_width / 2) - (sprites.ship_d.w / 2);
+	ship.y = (screen_height / 2) - (sprites.ship_d.h / 2);
+	ship.ship_max_x = screen_width - sprites.ship_d.w;
+	ship.ship_max_y = screen_height - sprites.ship_d.h;
 	ship.shot_timer = 0;
 	ship.lives = 3;
 	ship.respawn_timer = 0;
@@ -614,10 +663,10 @@ void ship_update()
 		ship.invincible_timer--;
 	else
 	{
-		if (shots_collide(true, ship.x, ship.y, sprites.ship_w, sprites.ship_h))
+		if (shots_collide(true, ship.x, ship.y, sprites.ship_d.w, sprites.ship_d.h))
 		{
-			int x = ship.x + (sprites.ship_w / 2);
-			int y = ship.y + (sprites.ship_h / 2);
+			int x = ship.x + (sprites.ship_d.w / 2);
+			int y = ship.y + (sprites.ship_d.h / 2);
 			fx_add(false, x, y);
 			fx_add(false, x + 4, y + 2);
 			fx_add(false, x - 2, y - 4);
@@ -633,7 +682,7 @@ void ship_update()
 		ship.shot_timer--;
 	else if (key[ALLEGRO_KEY_X])
 	{
-		int x = ship.x + (sprites.ship_w / 2);
+		int x = ship.x + (sprites.ship_d.w / 2);
 		if (shots_add(true, false, x, ship.y))
 			ship.shot_timer = 5;
 	}
@@ -651,29 +700,7 @@ void ship_draw()
 	al_draw_bitmap(sprites.ship, ship.x, ship.y, 0);
 }
 
-
 // --- aliens ---
-
-typedef enum ALIEN_TYPE
-{
-	ALIEN_TYPE_BUG = 0,
-	ALIEN_TYPE_ARROW,
-	ALIEN_TYPE_THICCBOI,
-	ALIEN_TYPE_N
-} ALIEN_TYPE;
-
-typedef struct ALIEN
-{
-	int x, y;
-	ALIEN_TYPE type;
-	int shot_timer;
-	int blink;
-	int life;
-	bool used;
-} ALIEN;
-
-#define ALIENS_N 16
-ALIEN aliens[ALIENS_N];
 
 void aliens_init()
 {
@@ -704,7 +731,7 @@ void aliens_update()
 				aliens[i].x = new_x;
 
 				aliens[i].y = between(-40, -30);
-				aliens[i].type = (ALIEN_TYPE)between(0, ALIEN_TYPE_N);
+				aliens[i].type = (ALIEN_TYPE_T)between(0, ALIEN_TYPE_N);
 				aliens[i].shot_timer = between(1, 99);
 				aliens[i].blink = 0;
 				aliens[i].used = true;
@@ -753,14 +780,14 @@ void aliens_update()
 		if (aliens[i].blink)
 			aliens[i].blink--;
 
-		if (shots_collide(false, aliens[i].x, aliens[i].y, ALIEN_W[aliens[i].type], ALIEN_H[aliens[i].type]))
+		if (shots_collide(false, aliens[i].x, aliens[i].y, sprites.alien_d[aliens[i].type].w, sprites.alien_d[aliens[i].type].h))
 		{
 			aliens[i].life--;
 			aliens[i].blink = 4;
 		}
 
-		int cx = aliens[i].x + (ALIEN_W[aliens[i].type] / 2);
-		int cy = aliens[i].y + (ALIEN_H[aliens[i].type] / 2);
+		int cx = aliens[i].x + (sprites.alien_d[aliens[i].type].w / 2);
+		int cy = aliens[i].y + (sprites.alien_d[aliens[i].type].h / 2);
 
 		if (aliens[i].life <= 0)
 		{
@@ -826,18 +853,7 @@ void aliens_draw()
 	}
 }
 
-
 // --- stars ---
-
-typedef struct STAR
-{
-	float y;
-	float speed;
-} STAR;
-
-//#define STARS_N ((screen_width / 2) - 1)
-#define STARS_N ((640 / 2) - 1)
-STAR stars[STARS_N];
 
 void stars_init()
 {
@@ -872,16 +888,12 @@ void stars_draw()
 	}
 }
 
-
 // --- hud ---
-
-ALLEGRO_FONT* font;
-long score_display;
 
 void hud_init()
 {
 	font = al_create_builtin_font();
-	must_init(font, "font");
+	InitializeCheck(font, "font");
 
 	score_display = 0;
 }
@@ -915,7 +927,7 @@ void hud_draw()
 		score_display
 	);
 
-	int spacing = sprites.life_w + 1;
+	int spacing = sprites.life_d.w + 1;
 	for (int i = 0; i < ship.lives; i++)
 		al_draw_bitmap(sprites.life, 1 + (i * spacing), 10, 0);
 
@@ -930,36 +942,48 @@ void hud_draw()
 }
 
 
-// --- main ---
-
+/*
+	Function: main
+	Description:
+		Main program loop. Initializes the program, draws intro screens
+		and title pages, and waits for user to hit keystroketo indicated
+		what they want to do. Performs all the program-wide initialization
+		at start-up and frees and releases resource before exiting.
+*/
 int main()
 {
-	// Iitialzie native dialog support
-	if (!al_init_native_dialog_addon()) return EXIT_FAILURE;
+	InitializeCheck(al_init(), "allegro");
+	
+	al_set_new_window_title("Alien Alley");
 
-	must_init(al_init(), "allegro");
-	must_init(al_install_keyboard(), "keyboard");
+	// Iitialzie native dialog support
+	InitializeCheck(al_init_native_dialog_addon(), "native dialog");
+
+	InitializeCheck(al_install_keyboard(), "keyboard");
 
 	ALLEGRO_TIMER* timer = al_create_timer(1.0 / 60.0);
-	must_init(timer, "timer");
+	InitializeCheck(timer, "timer");
 
 	ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
-	must_init(queue, "queue");
+	InitializeCheck(queue, "queue");
 
 	disp_init();
 
+	/* load high-score file */
+	//TODO: HighScoresLoad()
+
 	AudioInitialize();
 
-	must_init(al_init_image_addon(), "image");
+	InitializeCheck(al_init_image_addon(), "image");
 	sprites_init();
 
 	hud_init();
 
-	must_init(al_init_primitives_addon(), "primitives");
+	InitializeCheck(al_init_primitives_addon(), "primitives");
 
-	must_init(al_install_audio(), "audio");
-	must_init(al_init_acodec_addon(), "audio codecs");
-	must_init(al_reserve_samples(16), "reserve samples");
+	InitializeCheck(al_install_audio(), "audio");
+	InitializeCheck(al_init_acodec_addon(), "audio codecs");
+	InitializeCheck(al_reserve_samples(16), "reserve samples");
 
 	al_register_event_source(queue, al_get_keyboard_event_source());
 	al_register_event_source(queue, al_get_display_event_source(disp));
@@ -1029,6 +1053,9 @@ int main()
 		}
 	}
 
+	// Save high scores
+	//TODO: HighScoresSave();
+
 	sprites_deinit();
 	hud_deinit();
 	AudioFinalize();
@@ -1040,26 +1067,9 @@ int main()
 	return EXIT_SUCCESS;
 }
 
-
 #if 0
 /*
 
-' Setup some language sematics
-#Ifndef Boolean
-#define Boolean Integer
-#EndIf
-
-
-/* STRUCTURES AND TYPES */
-Type POINT_T
-x As Integer
-y As Integer
-End Type
-
-Type RECT_T
-a As Point_t
-b As Point_t
-End Type
 
 Type SPRITE_T
 Active As Boolean
@@ -1080,7 +1090,6 @@ End Type
 
 /* GLOBAL VARIABLES */
 Dim Shared GamePalette(0 To PAL_SIZE - 1) As Palette
-Dim Shared Score As Integer
 Dim Shared HeroShields As Integer = MAX_HERO_SHIELDS
 Dim Shared HighScore(0 To 9) As HIGH_SCORE_T
 Dim Shared ExplosionSound As SAMPLE Pointer
@@ -1134,18 +1143,7 @@ play_sample(s, 255, p, 1000 + IIf(Int(Timer) Mod 2, Rnd * p, Rnd * -p), FALSE)
 End Sub
 
 
-/*
-	Function: ComputeBoundingRect
-	Description:
-		Calculates the bounding rectangle for a sprite given its
-		position, origin offset, width, and height.
-*/
-Sub BoundingRectCompute(ByVal x As Integer, ByVal y As Integer, ByVal W As Integer, ByVal H As Integer, ByRef r As RECT_T)
-r.a.x = x
-r.a.y = y
-r.b.x = r.a.x + W - 1
-r.b.y = r.a.y + H - 1
-End Sub
+
 
 
 ' Collision testing routine (works only for 8-bit bitmaps at the moment!)
@@ -2311,64 +2309,6 @@ r.b.x = IIf(r1.b.x < r2.b.x, r1.b.x, r2.b.x)
 
 
 	/*
-		Function: ProgramInit
-		Description:
-			Performs all the program-wide initialization at start-up
-			time.  This includes sensing the presence of alternate input
-			devices and ensuring they are calibrated.
-	*/
-	Sub ProgramInitialize()
-	' Initialize some stuff
-	Randomize Timer
-
-	' Initialize Allegro
-	allegro_init()
-
-	' Initialize the timer
-	install_timer()
-
-	' Initialize the keyboard
-	install_keyboard()
-
-	' Initialize the mouse
-	install_mouse()
-
-	/* Initialize the sound and stuff */
-	install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL)
-
-	' Set the Window title
-	set_window_title("Alien Alley")
-
-	' Set screen properties
-	set_color_depth(8)
-
-	/* get into graphics */
-	set_gfx_mode(GFX_AUTODETECT_WINDOWED, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0)
-
-	/* initialize palette */
-	set_palette(@black_palette(0))
-
-	' Load sound fx and music
-	SoundInitialize()
-
-	/* load high-score file */
-	HighScoresLoad()
-	End Sub
-
-
-	Sub ProgramFinalize()
-	' Save high scores
-	HighScoresSave()
-
-	' Release sound resources (esp. MIDI here)
-	SoundFinalize()
-
-	' Clean up Allegro stuff
-	allegro_exit()
-	End Sub
-
-
-	/*
 		Function: Play
 		Description:
 			Play the game!
@@ -2450,14 +2390,9 @@ r.b.x = IIf(r1.b.x < r2.b.x, r1.b.x, r2.b.x)
 	fade_out(1)
 	End Sub
 
-
-	/*
-		Function: main
-		Description:
-			Main program loop.  Init's the program, draws intro screens
-			and title pages, and waits for user to hit keystroke
-			to indicated what they want to do.
-	*/
+	//
+	// MAIN
+	//
 	Function Main() As Integer
 	Dim Quit As Boolean = FALSE
 	Dim DrawTitle As Boolean = TRUE
