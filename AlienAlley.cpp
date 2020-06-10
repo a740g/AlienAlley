@@ -1070,7 +1070,6 @@ int main()
 #if 0
 /*
 
-
 Type SPRITE_T
 Active As Boolean
 p As POINT_T
