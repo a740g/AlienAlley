@@ -1,15 +1,15 @@
-/*--------------------------------------------------------*\
-|	   _    _ _                 _    _ _                   |
-|	  / \  | (_) ___ _ __      / \  | | | ___ _   _        |
-|    / _ \ | | |/ _ \ '_ \    / _ \ | | |/ _ \ | | |       |
-|   / ___ \| | |  __/ | | |  / ___ \| | |  __/ |_| |       |
-|  /_/   \_\_|_|\___|_| |_| /_/   \_\_|_|\___|\__, |       |
-|                                             |___/        |
-|													       |
-|  Conversion/port copyright (c) Samuel Gomes, 1998-2020.  |
-|  All rights reserved.                                    |
-|														   |
-\*--------------------------------------------------------*/
+///////////////////////////////////////////////////////////////////////
+//     _    _ _                 _    _ _
+//    / \  | (_) ___ _ __      / \  | | | ___ _   _ 
+//   / _ \ | | |/ _ \ '_ \    / _ \ | | |/ _ \ | | |
+//  / ___ \| | |  __/ | | |  / ___ \| | |  __/ |_| |
+// /_/   \_\_|_|\___|_| |_| /_/   \_\_|_|\___|\__, |
+//                                            |___/
+//
+//  Conversion/port copyright (c) Samuel Gomes & Neil Gomes, 1998-2020.
+//  All rights reserved.
+//
+///////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -990,6 +990,7 @@ int main()
 	al_register_event_source(queue, al_get_timer_event_source(timer));
 
 	keyboard_init();
+	al_hide_mouse_cursor(disp);		// TODO: we need to move this to a good place later
 	fx_init();
 	shots_init();
 	ship_init();
@@ -1058,6 +1059,7 @@ int main()
 
 	sprites_deinit();
 	hud_deinit();
+	al_show_mouse_cursor(disp);
 	AudioFinalize();
 	disp_deinit();
 	al_destroy_timer(timer);
