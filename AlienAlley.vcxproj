@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClCompile Include="AlienAlley.cpp" />
     <ClCompile Include="CelestialObjects.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="AlienAlley.ico" />
@@ -163,6 +164,7 @@
   <ItemGroup>
     <ClInclude Include="AlienAlley.h" />
     <ClInclude Include="CelestialObjects.h" />
+    <ClInclude Include="MainMenu.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

@@ -10,6 +10,7 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_native_dialog.h>
 #include "CelestialObjects.h"
+#include "MainMenu.h"
 
 constexpr auto INTRO_TEXT_COLOR = 15;
 constexpr auto MAX_ALIENS = 4;

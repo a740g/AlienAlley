@@ -6,8 +6,7 @@
 // /_/   \_\_|_|\___|_| |_| /_/   \_\_|_|\___|\__, |
 //                                            |___/
 //
-//  Conversion/port copyright (c) Samuel Gomes & Neil Gomes, 1998-2020.
-//  All rights reserved.
+//  Conversion/port copyright © Samuel Gomes & Neil Gomes, 1998-2020.
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -213,6 +212,7 @@ void AudioInitialize()
 	sample_explode[1] = al_load_sample("dat/snd/sfx/alien_explosion_big.flac");
 	InitializeCheck(sample_explode[1], "dat/snd/sfx/alien_explosion_big.flac");
 
+	// Streaming music playback
 	music = al_load_audio_stream("dat/snd/mus/alien_main.opus", 2, 2048);
 	InitializeCheck(music, "music");
 	al_set_audio_stream_playmode(music, ALLEGRO_PLAYMODE_LOOP);
@@ -794,6 +794,7 @@ int main()
 
 	// Initizlize celestial objects
 	CelestialObjects celestialObjects(screen_width, screen_height);
+	// Initialize main menu
 
 	frames = 0;
 	score = 0;
@@ -813,7 +814,7 @@ int main()
 		case ALLEGRO_EVENT_TIMER:
 			fx_update();
 			shots_update();
-			celestialObjects.update();
+			celestialObjects.update(key[ALLEGRO_KEY_UP]);		// TODO: this needs to the input agnostic
 			ship_update();
 			aliens_update();
 			hud_update();
@@ -866,6 +867,7 @@ int main()
 
 	return EXIT_SUCCESS;
 }
+
 
 #if 0
 /*
@@ -1359,112 +1361,6 @@ r.b.x = IIf(r1.b.x < r2.b.x, r1.b.x, r2.b.x)
 	End Sub
 
 
-	/*
-		Function: InitMap
-		Description:
-			Initialize the map with random tiles.
-	*/
-	Sub MapInitialize()
-	Dim As Integer x, y, w, h, c
-
-	' Create the main tile buffer first
-	MapBuffer = create_bitmap(SCREEN_WIDTH, SCREEN_HEIGHT)
-
-	/* load the background tiles to video memory */
-	Tile(0) = load_bitmap(ExePath & "/dat/gfx/stars1.pcx", @GamePalette(0))
-	Tile(1) = load_bitmap(ExePath & "/dat/gfx/stars2.pcx", @GamePalette(0))
-	Tile(2) = load_bitmap(ExePath & "/dat/gfx/earth.pcx", @GamePalette(0))
-
-	' Set other variables
-	MapScrollStep = MAP_SCROLL_STEP_NORMAL
-	MapLineCounter = -TILE_HEIGHT
-
-	' Just draw ramdom tiles on the background
-	w = (MapBuffer->w / TILE_WIDTH) - 1
-	h = (MapBuffer->h / TILE_HEIGHT) - 1
-
-	For y = 0 To h
-	For x = 0 To w
-	' We just need more stars and less planets
-	c = Rnd * 256
-	If(c = 128) Then
-	c = NUM_TILES - 1
-	Else
-	c Mod = 2
-	End If
-
-	' Blit the random tile
-	blit(Tile(c), MapBuffer, 0, 0, x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT)
-	Next
-	Next
-	End Sub
-
-
-	' Destroys the background tile map stuff
-	Sub MapFinalize()
-	Dim i As Integer
-
-	If(MapBuffer <> NULL) Then
-	destroy_bitmap(MapBuffer)
-	MapBuffer = NULL
-	End If
-
-	For i = 0 To NUM_TILES - 1
-	If(Tile(i) < > NULL) Then
-	destroy_bitmap(Tile(i))
-	Tile(i) = NULL
-	End If
-	Next
-	End Sub
-
-
-	/*
-		Function: ScrollScreen
-		Description:
-			Scroll the hidden page up a few lines and draw the next row
-			of tiles above, if necessary.  Moves the screen
-	*/
-	Sub MapScroll()
-	Dim As Integer i, c
-
-	' Check all new tiles are completely shown; if so reset it
-	If(MapLineCounter > 0) Then MapLineCounter = -TILE_HEIGHT
-
-	' Check if we have to generate a fresh set of tiles at the top of the map
-	If(MapLineCounter <= -TILE_HEIGHT) Then
-	' Okay. Generate all the new tiles to be draw at the top of the map
-	For i = 0 To(SCREEN_WIDTH / TILE_WIDTH) - 1
-	' We just need more stars and less planets
-	c = Rnd * 256
-	If(c = 128) Then
-	c = NUM_TILES - 1
-	Else
-	c Mod = 2
-	End If
-
-	MapLine(i) = c
-	Next
-	End If
-
-	' Shift the entire background down by "scrollstep" pixels
-	blit(MapBuffer, MapBuffer, 0, 0, 0, MapScrollStep, MapBuffer->w, MapBuffer->h - MapScrollStep)
-
-	' Move the new tiles down by "scrollstep"
-	MapLineCounter += MapScrollStep
-
-	' Draw the new tiles at the top
-	For i = 0 To(SCREEN_WIDTH / TILE_WIDTH) - 1
-	blit(Tile(MapLine(i)), MapBuffer, 0, 0, i * TILE_WIDTH, MapLineCounter, TILE_WIDTH, TILE_HEIGHT)
-	Next
-	End Sub
-
-
-	' Draws the map buffer to the frame buffer
-	Sub MapDraw()
-	blit(MapBuffer, FrameBuffer, 0, 0, 0, 0, MapBuffer->w, MapBuffer->h)
-	End Sub
-
-
 	' Loads and plays a MIDI file (loops it too)
 	Sub MIDIPlay(s As String)
 	' Unload music if loaded
@@ -1609,67 +1505,6 @@ r.b.x = IIf(r1.b.x < r2.b.x, r1.b.x, r2.b.x)
 	textout(Screen, font, " ", Column, Row, HIGH_SCORE_COLOR)
 
 	/* fade to black... */
-	fade_out(1)
-	End Sub
-
-
-	/*
-		Function: TitlePage
-		Description:
-			Displays the Alien Alley title page.
-	*/
-	Sub TitlePageDisplay()
-	Dim Image As BITMAP Pointer
-
-	/* start title music */
-	MIDIPlay("alienintro.mid")
-
-	/* clear screen */
-	clear_bitmap(Screen)
-
-	/* set everything to black so we can draw without being seen */
-	set_palette(@black_palette(0))
-
-	/* first page of stuff */
-	Image = load_bitmap(ExePath & "/dat/gfx/title.pcx", @GamePalette(0))
-
-	' Stretch bmp to fill the screen
-	If(Image <> NULL) Then
-	stretch_blit(Image, Screen, 0, 0, Image->w, Image->h, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-	destroy_bitmap(Image)
-	End If
-
-	' Fade in
-	fade_in(@GamePalette(0), 1)
-	End Sub
-
-
-	/*
-		Function: IntroCredits
-		Description:
-			Displays the introduction credits.
-	*/
-	Sub IntroCreditsDisplay()
-	' Clear the screen
-	clear_bitmap(Screen)
-
-	/* set everything to black so we can draw without being seen */
-	set_palette(@black_palette(0))
-
-	/* first page of stuff */
-	StringDrawCenter("Coriolis Group Books", 28, INTRO_TEXT_COLOR)
-	StringDrawCenter("Presents", 31, INTRO_TEXT_COLOR)
-	fade_in(@default_palette(0), 1)
-	fade_out(1)
-
-	' Clear the screen
-	clear_bitmap(Screen)
-
-	/* second page of stuff */
-	StringDrawCenter("A", 27, INTRO_TEXT_COLOR)
-	StringDrawCenter("Dave Roberts", 29, INTRO_TEXT_COLOR)
-	StringDrawCenter("Production", 31, INTRO_TEXT_COLOR)
-	fade_in(@default_palette(0), 1)
 	fade_out(1)
 	End Sub
 

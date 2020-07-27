@@ -105,11 +105,11 @@ CelestialObjects::~CelestialObjects()
 	delete [] object;
 }
 
-void CelestialObjects::update()
+void CelestialObjects::update(bool isWarping)
 {
 	for (int i = 0; i < objectCount; i++)
 	{
-		object[i].y += object[i].speed;
+		object[i].y += object[i].speed * (isWarping ? 2 : 1);
 		if (object[i].y >= bufferHeight + maxSpriteHeight)
 		{
 			object[i].y = -maxSpriteHeight;
@@ -139,8 +139,7 @@ void CelestialObjects::draw()
 		}
 		else
 		{
-			float l = object[i].speed * 0.8;
-			if (object[i].y >= 0 && object[i].y <= bufferHeight) al_draw_pixel(objectX, object[i].y, al_map_rgb_f(l, l, l));
+			if (object[i].y >= 0 && object[i].y <= bufferHeight) al_draw_pixel(objectX, object[i].y, al_map_rgb_f(object[i].speed * between(0.1f, 0.8f), object[i].speed * between(0.1f, 0.8f), object[i].speed * between(0.1f, 0.8f)));
 		}
 		objectX += 2;
 	}

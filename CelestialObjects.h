@@ -8,7 +8,7 @@ public:
 
 	CelestialObjects(int screenWidth, int screenHeight);	// initialize celestial objects
 	~CelestialObjects();									// cleanup
-	void update();											// update positions
+	void update(bool isWarping);							// update positions
 	void draw();											// draw objects
 
 private:
