@@ -6,10 +6,10 @@ class CelestialObjects
 {
 public:
 
-	CelestialObjects(int screenWidth, int screenHeight);	// initialize celestial objects
-	~CelestialObjects();									// cleanup
-	void update(bool isWarping);							// update positions
-	void draw();											// draw objects
+	CelestialObjects();				// initialize celestial objects
+	~CelestialObjects();			// cleanup
+	void update(bool isWarping);	// update positions
+	void draw();					// draw objects
 
 private:
 

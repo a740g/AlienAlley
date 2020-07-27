@@ -14,15 +14,18 @@ public:
 		EXIT_GAME,
 	};
 
-	MainMenu(int screenWidth, int screenHeight);
+	MainMenu();
 	~MainMenu();
 	void drawIntroCreditsScreen();
 	void drawTitleScreen();
 	int userInput();
+	void fadeIn();
+	void fadeOut();
 
 private:
 
 	// Screen properties
+	ALLEGRO_DISPLAY* display = NULL;
 	int bufferWidth = 0;
 	int bufferHeight = 0;
 
@@ -31,6 +34,5 @@ private:
 	int bitmapWidth = 0;
 	int bitmapHeight = 0;
 
-	void FadeIn();
-	void FadeOut();
+	void drawScaledBitmap();
 };

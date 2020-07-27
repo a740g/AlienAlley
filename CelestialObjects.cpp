@@ -1,11 +1,11 @@
 #include "CelestialObjects.h"
 
 
-CelestialObjects::CelestialObjects(int screenWidth, int screenHeight)
+CelestialObjects::CelestialObjects()
 {
 	// Initialize the buffer width and height
-	bufferWidth = screenWidth;
-	bufferHeight = screenHeight;
+	bufferWidth = al_get_display_width(al_get_current_display());
+	bufferHeight = al_get_display_height(al_get_current_display());
 
 	// How many objects do we want on the screen
 	objectCount = bufferWidth / 2;

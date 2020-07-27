@@ -1,9 +1,10 @@
 #include "MainMenu.h"
 
-MainMenu::MainMenu(int screenWidth, int screenHeight)
+MainMenu::MainMenu()
 {
-	bufferWidth = screenWidth;
-	bufferHeight = screenHeight;
+	display = al_get_current_display();
+	bufferWidth = al_get_display_width(display);
+	bufferHeight = al_get_display_height(display);
 	bitmap = NULL;
 	bitmapWidth = bitmapHeight = 0;
 }
@@ -32,17 +33,15 @@ void MainMenu::drawIntroCreditsScreen()
 	bitmapWidth = al_get_bitmap_width(bitmap);
 	bitmapHeight = al_get_bitmap_height(bitmap);
 
-	// TODO: draw without being seen
-
 	// Stretch bitmap to fill the screen
-	al_draw_scaled_bitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, 0, 0, bufferWidth, bufferHeight, 0);
+	drawScaledBitmap();
 
 	al_destroy_bitmap(bitmap);
 	bitmap = NULL;
 	bitmapWidth = bitmapHeight = 0;
 
-	FadeIn();
-	FadeOut();
+	fadeIn();
+	fadeOut();
 
 	// Clear the screen
 	al_clear_to_color(al_map_rgb(0, 0, 0));
@@ -53,17 +52,15 @@ void MainMenu::drawIntroCreditsScreen()
 	bitmapWidth = al_get_bitmap_width(bitmap);
 	bitmapHeight = al_get_bitmap_height(bitmap);
 
-	// TODO: draw without being seen
-
 	// Stretch bitmap to fill the screen
-	al_draw_scaled_bitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, 0, 0, bufferWidth, bufferHeight, 0);
+	drawScaledBitmap();
 
 	al_destroy_bitmap(bitmap);
 	bitmap = NULL;
 	bitmapWidth = bitmapHeight = 0;
 
-	FadeIn();
-	FadeOut();
+	fadeIn();
+	fadeOut();
 }
 
 // Displays the Alien Alley title page
@@ -77,16 +74,14 @@ void MainMenu::drawTitleScreen()
 	bitmapWidth = al_get_bitmap_width(bitmap);
 	bitmapHeight = al_get_bitmap_height(bitmap);
 
-	// TODO: draw without being seen
-
 	// Stretch bitmap to fill the screen
-	al_draw_scaled_bitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, 0, 0, bufferWidth, bufferHeight, 0);
+	drawScaledBitmap();
 
 	al_destroy_bitmap(bitmap);
 	bitmap = NULL;
 	bitmapWidth = bitmapHeight = 0;
 
-	FadeIn();
+	fadeIn();
 }
 
 
@@ -98,13 +93,46 @@ int MainMenu::userInput()
 }
 
 
-void MainMenu::FadeIn()
+void MainMenu::fadeIn()
 {
-	// TODO: Add your implementation code here.
+	ALLEGRO_BITMAP* tempBitmap = al_clone_bitmap(al_get_backbuffer(display));
+
+	for (int a = 0; a < 256; a++)
+	{
+		al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+		al_draw_tinted_bitmap(tempBitmap, al_map_rgba(a, a, a, a), 0, 0, 0);
+		al_flip_display();
+		al_rest(0.005);
+	}
+
+	al_destroy_bitmap(tempBitmap);
 }
 
 
-void MainMenu::FadeOut()
+void MainMenu::fadeOut()
 {
-	// TODO: Add your implementation code here.
+	ALLEGRO_BITMAP* tempBitmap = al_clone_bitmap(al_get_backbuffer(display));
+
+	for (int a = 0; a < 256; a++)
+	{
+		al_clear_to_color(al_map_rgba(0, 0, 0, 0));
+		al_draw_tinted_bitmap(tempBitmap, al_map_rgba(255 - a, 255 - a, 255 - a, a), 0, 0, 0);
+		al_flip_display();
+		al_rest(0.005);
+	}
+
+	al_destroy_bitmap(tempBitmap);
+}
+
+// We scale the pictures keeping aspect ratio intact
+void MainMenu::drawScaledBitmap()
+{
+	float factor_x = (float)bufferWidth / (float)bitmapWidth;
+	float factor_y = (float)bufferHeight / (float)bitmapHeight;
+	float factor = (factor_y < factor_x) ? factor_y : factor_x;
+	float w = (float)bitmapWidth * factor;
+	float h = (float)bitmapHeight * factor;
+	float x = ((float)bufferWidth / 2.0f) - (w / 2.0f);
+	float y = ((float)bufferHeight / 2.0f) - (h / 2.0f);
+	al_draw_scaled_bitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, x, y, w, h, 0);
 }

@@ -83,8 +83,6 @@ bool collide(int ax1, int ay1, int ax2, int ay2, int bx1, int by1, int bx2, int 
 
 void disp_init()
 {
-	al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
-	al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
 	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_FRAMELESS);
 	disp = al_create_display(screen_width, screen_height);
 	InitializeCheck(disp, "display");
@@ -793,8 +791,9 @@ int main()
 	aliens_init();
 
 	// Initizlize celestial objects
-	CelestialObjects celestialObjects(screen_width, screen_height);
+	CelestialObjects celestialObjects;
 	// Initialize main menu
+	MainMenu mainMenu;
 
 	frames = 0;
 	score = 0;
@@ -802,6 +801,9 @@ int main()
 	bool done = false;
 	bool redraw = true;
 	ALLEGRO_EVENT event;
+
+	mainMenu.drawIntroCreditsScreen();
+	mainMenu.drawTitleScreen();
 
 	al_start_timer(timer);
 
