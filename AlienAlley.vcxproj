@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AlienAlley.cpp" />
+    <ClCompile Include="CelestialObjects.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="AlienAlley.ico" />
@@ -160,6 +161,8 @@
     <ResourceCompile Include="AlienAlley.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AlienAlley.h" />
+    <ClInclude Include="CelestialObjects.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
