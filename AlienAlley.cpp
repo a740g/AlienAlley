@@ -212,7 +212,7 @@ void AudioInitialize()
 
 	// Streaming music playback
 	music = al_load_audio_stream("dat/snd/mus/alien_main.opus", 2, 2048);
-	InitializeCheck(music, "music");
+	InitializeCheck(music, "dat/snd/mus/alien_main.opus");
 	al_set_audio_stream_playmode(music, ALLEGRO_PLAYMODE_LOOP);
 	al_attach_audio_stream_to_mixer(music, al_get_default_mixer());
 }

@@ -96,6 +96,7 @@ int MainMenu::userInput()
 void MainMenu::fadeIn()
 {
 	ALLEGRO_BITMAP* tempBitmap = al_clone_bitmap(al_get_backbuffer(display));
+	InitializeCheck(tempBitmap, "fadeIn: failed to get video memory bitmap");
 
 	for (int a = 0; a < 256; a++)
 	{
@@ -112,6 +113,7 @@ void MainMenu::fadeIn()
 void MainMenu::fadeOut()
 {
 	ALLEGRO_BITMAP* tempBitmap = al_clone_bitmap(al_get_backbuffer(display));
+	InitializeCheck(tempBitmap, "fadeOut: failed to get video memory bitmap");
 
 	for (int a = 0; a < 256; a++)
 	{
@@ -124,7 +126,7 @@ void MainMenu::fadeOut()
 	al_destroy_bitmap(tempBitmap);
 }
 
-// We scale the pictures keeping aspect ratio intact
+// We scale the pictures keeping aspect ratio intact and nothing is cropped
 void MainMenu::drawScaledBitmap()
 {
 	float factor_x = (float)bufferWidth / (float)bitmapWidth;

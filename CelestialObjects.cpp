@@ -82,13 +82,13 @@ CelestialObjects::CelestialObjects()
 		object[i].y = between(-(float)maxSpriteHeight, (float)bufferHeight + (float)maxSpriteHeight);
 		// Force the object to be a star more times than not
 		if (rand() % UCHAR_MAX == 0) {
-			object[i].objectType = between(STAR, OBJECT_TYPE_COUNT - 1);
-			object[i].speed = 0.05f * (float)object[i].objectType;
+			object[i].objectType = between(STAR + 1, OBJECT_TYPE_COUNT - 1);
+			object[i].speed = between(objectSpeed[object[i].objectType] - 0.1f, objectSpeed[object[i].objectType] + 0.1f);
 		}
 		else
 		{
-			object[i].speed = between(0.1f, 1.0f);
 			object[i].objectType = STAR;
+			object[i].speed = between(objectSpeed[STAR] - 0.1f, objectSpeed[STAR] + 0.1f);
 		}
 	}
 }
@@ -115,13 +115,13 @@ void CelestialObjects::update(bool isWarping)
 			object[i].y = -maxSpriteHeight;
 			// Force the object to be a star more times than not
 			if (rand() % UCHAR_MAX == 0) {
-				object[i].objectType = between(STAR, OBJECT_TYPE_COUNT - 1);
-				object[i].speed = object[i].speed = 0.05f * (float)object[i].objectType;;
+				object[i].objectType = between(STAR + 1, OBJECT_TYPE_COUNT - 1);
+				object[i].speed = between(objectSpeed[object[i].objectType] - 0.1f, objectSpeed[object[i].objectType] + 0.1f);
 			}
 			else
 			{
-				object[i].speed = between(0.1f, 1.0f);
 				object[i].objectType = STAR;
+				object[i].speed = between(objectSpeed[STAR] - 0.1f, objectSpeed[STAR] + 0.1f);
 			}
 		}
 	}
@@ -139,7 +139,8 @@ void CelestialObjects::draw()
 		}
 		else
 		{
-			if (object[i].y >= 0 && object[i].y <= bufferHeight) al_draw_pixel(objectX, object[i].y, al_map_rgb_f(object[i].speed * between(0.1f, 0.8f), object[i].speed * between(0.1f, 0.8f), object[i].speed * between(0.1f, 0.8f)));
+			float l = 0.1f + (0.7f - 0.1f) * ((object[i].speed - 0.4f) / (0.6f - 0.4f));
+			if (object[i].y >= 0 && object[i].y <= bufferHeight) al_draw_pixel(objectX, object[i].y, al_map_rgb_f(l + between(0.0f, 0.3f), l + between(0.0f, 0.3f), l + between(0.0f, 0.3f)));
 		}
 		objectX += 2;
 	}
