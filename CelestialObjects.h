@@ -19,7 +19,7 @@ private:
 	int maxSpriteHeight = 0;
 
 	// Type of objects
-	enum ObjectTypes
+	enum
 	{
 		STAR = 0,
 		GALAXY_1,
