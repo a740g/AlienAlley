@@ -71,6 +71,7 @@ CelestialObjects::CelestialObjects()
 	objectSprite[PLANET_4].height = al_get_bitmap_height(objectSprite[PLANET_4].bitmap);
 
 	// Find the maximum object sprite height. This will help us calculate how much offscreen do we need to accout for the sprite to "properly" come in & out of view
+	maxSpriteHeight = 0;
 	for (int i = 0; i < OBJECT_TYPE_COUNT; i++)
 	{
 		if (maxSpriteHeight < objectSprite[i].height) maxSpriteHeight = objectSprite[i].height;

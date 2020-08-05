@@ -25,14 +25,14 @@ public:
 private:
 
 	// Screen properties
-	ALLEGRO_DISPLAY* display = NULL;
-	int bufferWidth = 0;
-	int bufferHeight = 0;
+	ALLEGRO_DISPLAY* display;
+	int bufferWidth;
+	int bufferHeight;
 
 	// Bitmap properties
-	ALLEGRO_BITMAP* bitmap = NULL;
-	int bitmapWidth = 0;
-	int bitmapHeight = 0;
+	ALLEGRO_BITMAP* bitmap;
+	int bitmapWidth;
+	int bitmapHeight;
 
 	void drawScaledBitmap();
 };

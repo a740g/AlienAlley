@@ -13,10 +13,10 @@ public:
 
 private:
 
-	int objectCount = 0;	// total number of objects on the screen
-	int bufferWidth = 0;
-	int bufferHeight = 0;
-	int maxSpriteHeight = 0;
+	int objectCount;				// total number of objects on the screen
+	int bufferWidth;
+	int bufferHeight;
+	int maxSpriteHeight;
 
 	// Type of objects
 	enum
@@ -53,5 +53,5 @@ private:
 		float speed;
 		int objectType;
 
-	}* object = NULL;
+	}* object;
 };
