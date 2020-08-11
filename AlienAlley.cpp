@@ -51,22 +51,6 @@ float between(float lo, float hi)
 	return lo + ((float)rand() / (float)RAND_MAX) * (hi - lo);
 }
 
-
-/*
-	Function: BoundingRectCompute
-	Description:
-		Calculates the bounding rectangle for a sprite given its
-		position, width and height.
-*/
-void BoundingRectCompute(const POINT_T* p, const DIM_T* d, RECT_T* r)
-{
-	r->a.x = p->x;
-	r->a.y = p->y;
-	r->b.x = r->a.x + d->w - 1;
-	r->b.y = r->a.y + d->h - 1;
-}
-
-
 bool collide(int ax1, int ay1, int ax2, int ay2, int bx1, int by1, int bx2, int by2)
 {
 	if (ax1 > bx2) return false;

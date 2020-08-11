@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <algorithm>
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
@@ -9,6 +11,9 @@
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_native_dialog.h>
+#include "Size2D.h"
+#include "Point2D.h"
+#include "Rect2D.h"
 #include "CelestialObjects.h"
 #include "MainMenu.h"
 #include "HUD.h"
@@ -32,21 +37,9 @@ enum ALIEN_TYPE_T
 	ALIEN_TYPE_N
 };
 
-// Absolute X, Y
-struct POINT_T
-{
-	int x;
-	int y;
-};
-
-// Rectangle
-struct RECT_T
-{
-	POINT_T a;
-	POINT_T b;
-};
 
 // Rectange dimension
+
 struct DIM_T
 {
 	int w;
@@ -69,7 +62,6 @@ struct SPRITES_T
 
 	ALLEGRO_BITMAP* explosion;
 	ALLEGRO_BITMAP* sparks;
-
 	ALLEGRO_BITMAP* powerup;
 };
 
