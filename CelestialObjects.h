@@ -4,13 +4,6 @@
 
 class CelestialObjects
 {
-public:
-
-	CelestialObjects();				// initialize celestial objects
-	~CelestialObjects();			// cleanup
-	void update(bool isWarping);	// update positions
-	void draw();					// draw objects
-
 private:
 
 	int objectCount;				// total number of objects on the screen
@@ -36,7 +29,7 @@ private:
 	};
 
 	// This matches with the object types above
-	const float objectSpeed[OBJECT_TYPE_COUNT] = {0.5f, 0.2f, 0.2f, 0.2f, 0.2f, 0.8f, 0.8f, 0.8f, 0.8f, 1.1f, 1.1f};
+	const float OBJECT_SPEED[OBJECT_TYPE_COUNT] = {0.5f, 0.2f, 0.2f, 0.2f, 0.2f, 0.8f, 0.8f, 0.8f, 0.8f, 1.1f, 1.1f};
 
 	// This will hold the sprite bitmap and information
 	struct ObjectSprite
@@ -54,4 +47,11 @@ private:
 		int objectType;
 
 	}* object;
+
+public:
+
+	CelestialObjects();				// initialize celestial objects
+	~CelestialObjects();			// cleanup
+	void update(bool isWarping);	// update positions
+	void draw();					// draw objects
 };

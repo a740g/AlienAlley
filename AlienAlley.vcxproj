@@ -108,10 +108,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <WarningLevel>Level4</WarningLevel>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -153,6 +154,7 @@
   <ItemGroup>
     <ClCompile Include="AlienAlley.cpp" />
     <ClCompile Include="CelestialObjects.cpp" />
+    <ClCompile Include="HUD.cpp" />
     <ClCompile Include="MainMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +166,7 @@
   <ItemGroup>
     <ClInclude Include="AlienAlley.h" />
     <ClInclude Include="CelestialObjects.h" />
+    <ClInclude Include="HUD.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

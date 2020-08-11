@@ -21,8 +21,6 @@ long score;												// What is the player score?
 ALLEGRO_SAMPLE* sample_shot;
 ALLEGRO_SAMPLE* sample_explode[2];
 ALLEGRO_AUDIO_STREAM* music;
-ALLEGRO_FONT* font;
-long score_display;
 SPRITES_T sprites;
 FX_T fx[FX_N];
 SHOT_T shots[SHOTS_N];
@@ -128,11 +126,6 @@ void sprites_init()
 	InitializeCheck(sprites.ship, "dat/gfx/hero.png");
 	sprites.ship_d.w = al_get_bitmap_width(sprites.ship);
 	sprites.ship_d.h = al_get_bitmap_height(sprites.ship);
-
-	sprites.life = al_load_bitmap("dat/gfx/life.png");
-	InitializeCheck(sprites.life, "dat/gfx/life.png");
-	sprites.life_d.w = al_get_bitmap_width(sprites.life);
-	sprites.life_d.h = al_get_bitmap_height(sprites.life);
 
 	sprites.ship_shot[0] = al_load_bitmap("dat/gfx/hero_shot0.png");
 	InitializeCheck(sprites.ship_shot[0], "dat/gfx/hero_shot0.png");
@@ -455,14 +448,14 @@ void ship_init()
 	ship.ship_max_x = screen_width - sprites.ship_d.w;
 	ship.ship_max_y = screen_height - sprites.ship_d.h;
 	ship.shot_timer = 0;
-	ship.lives = 3;
+	ship.lives = HUD::LIVES_MAX;
 	ship.respawn_timer = 0;
 	ship.invincible_timer = 120;
 }
 
 void ship_update()
 {
-	if (ship.lives < 0)
+	if (ship.lives <= 0)
 		return;
 
 	if (ship.respawn_timer)
@@ -519,7 +512,7 @@ void ship_update()
 
 void ship_draw()
 {
-	if (ship.lives < 0)
+	if (ship.lives <= 0)
 		return;
 	if (ship.respawn_timer)
 		return;
@@ -625,15 +618,15 @@ void aliens_update()
 			switch (aliens[i].type)
 			{
 			case ALIEN_TYPE_BUG:
-				score += 200;
+				score += 20;
 				break;
 
 			case ALIEN_TYPE_ARROW:
-				score += 150;
+				score += 15;
 				break;
 
 			case ALIEN_TYPE_THICCBOI:
-				score += 800;
+				score += 80;
 				fx_add(false, cx - 10, cy - 4);
 				fx_add(false, cx + 4, cy + 10);
 				fx_add(false, cx + 8, cy + 8);
@@ -682,60 +675,6 @@ void aliens_draw()
 	}
 }
 
-// --- hud ---
-
-void hud_init()
-{
-	font = al_create_builtin_font();
-	InitializeCheck(font, "font");
-
-	score_display = 0;
-}
-
-void hud_deinit()
-{
-	al_destroy_font(font);
-}
-
-void hud_update()
-{
-	if (frames % 2)
-		return;
-
-	for (long i = 5; i > 0; i--)
-	{
-		long diff = 1 << i;
-		if (score_display <= (score - diff))
-			score_display += diff;
-	}
-}
-
-void hud_draw()
-{
-	al_draw_textf(
-		font,
-		al_map_rgb_f(1, 1, 1),
-		1, 1,
-		0,
-		"%06ld",
-		score_display
-	);
-
-	int spacing = sprites.life_d.w + 1;
-	for (int i = 0; i < ship.lives; i++)
-		al_draw_bitmap(sprites.life, 1 + (i * spacing), 10, 0);
-
-	if (ship.lives < 0)
-		al_draw_text(
-			font,
-			al_map_rgb_f(1, 1, 1),
-			screen_width / 2, screen_height / 2,
-			ALLEGRO_ALIGN_CENTER,
-			"G A M E  O V E R"
-		);
-}
-
-
 /*
 	Function: main
 	Description:
@@ -771,8 +710,6 @@ int main()
 	InitializeCheck(al_init_image_addon(), "image");
 	sprites_init();
 
-	hud_init();
-
 	InitializeCheck(al_init_primitives_addon(), "primitives");
 
 	InitializeCheck(al_install_audio(), "audio");
@@ -790,10 +727,13 @@ int main()
 	ship_init();
 	aliens_init();
 
+	// TODO: These should created using new and freed using delete
 	// Initizlize celestial objects
 	CelestialObjects celestialObjects;
 	// Initialize main menu
 	MainMenu mainMenu;
+	// Initialize game HUD
+	HUD gameHUD;
 
 	frames = 0;
 	score = 0;
@@ -802,8 +742,8 @@ int main()
 	bool redraw = true;
 	ALLEGRO_EVENT event;
 
-	mainMenu.drawIntroCreditsScreen();
-	mainMenu.drawTitleScreen();
+	//mainMenu.drawIntroCreditsScreen();
+	//mainMenu.drawTitleScreen();
 
 	al_start_timer(timer);
 
@@ -819,7 +759,7 @@ int main()
 			celestialObjects.update(key[ALLEGRO_KEY_UP]);		// TODO: this needs to the input agnostic
 			ship_update();
 			aliens_update();
-			hud_update();
+			gameHUD.update(score, ship.lives, gameHUD.SHIELD_MAX);
 
 			if (key[ALLEGRO_KEY_ESCAPE])
 				done = true;
@@ -848,7 +788,7 @@ int main()
 			fx_draw();
 			ship_draw();
 
-			hud_draw();
+			gameHUD.draw();
 
 			al_flip_display();
 			redraw = false;
@@ -859,7 +799,6 @@ int main()
 	//TODO: HighScoresSave();
 
 	sprites_deinit();
-	hud_deinit();
 	al_show_mouse_cursor(disp);
 	AudioFinalize();
 	disp_deinit();

@@ -4,6 +4,20 @@
 
 class MainMenu
 {
+private:
+
+	// Screen properties
+	ALLEGRO_DISPLAY* display;
+	int bufferWidth;
+	int bufferHeight;
+
+	// Bitmap properties
+	ALLEGRO_BITMAP* bitmap;
+	int bitmapWidth;
+	int bitmapHeight;
+
+	void drawScaledBitmap();
+
 public:
 
 	// Type of objects
@@ -21,18 +35,4 @@ public:
 	int userInput();
 	void fadeIn();
 	void fadeOut();
-
-private:
-
-	// Screen properties
-	ALLEGRO_DISPLAY* display;
-	int bufferWidth;
-	int bufferHeight;
-
-	// Bitmap properties
-	ALLEGRO_BITMAP* bitmap;
-	int bitmapWidth;
-	int bitmapHeight;
-
-	void drawScaledBitmap();
 };

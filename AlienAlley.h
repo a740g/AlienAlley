@@ -11,6 +11,7 @@
 #include <allegro5/allegro_native_dialog.h>
 #include "CelestialObjects.h"
 #include "MainMenu.h"
+#include "HUD.h"
 
 constexpr auto KEY_SEEN = 1;							// Key see and released flags
 constexpr auto KEY_RELEASED = 2;
@@ -59,9 +60,6 @@ struct SPRITES_T
 
 	ALLEGRO_BITMAP* ship_shot[2];
 	DIM_T ship_shot_d;
-
-	ALLEGRO_BITMAP* life;
-	DIM_T life_d;
 
 	ALLEGRO_BITMAP* alien[ALIEN_TYPE_N];
 	DIM_T alien_d[ALIEN_TYPE_N];

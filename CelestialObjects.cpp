@@ -84,12 +84,12 @@ CelestialObjects::CelestialObjects()
 		// Force the object to be a star more times than not
 		if (rand() % UCHAR_MAX == 0) {
 			object[i].objectType = between(STAR + 1, OBJECT_TYPE_COUNT - 1);
-			object[i].speed = between(objectSpeed[object[i].objectType] - 0.1f, objectSpeed[object[i].objectType] + 0.1f);
+			object[i].speed = between(OBJECT_SPEED[object[i].objectType] - 0.1f, OBJECT_SPEED[object[i].objectType] + 0.1f);
 		}
 		else
 		{
 			object[i].objectType = STAR;
-			object[i].speed = between(objectSpeed[STAR] - 0.1f, objectSpeed[STAR] + 0.1f);
+			object[i].speed = between(OBJECT_SPEED[STAR] - 0.1f, OBJECT_SPEED[STAR] + 0.1f);
 		}
 	}
 }
@@ -117,12 +117,12 @@ void CelestialObjects::update(bool isWarping)
 			// Force the object to be a star more times than not
 			if (rand() % UCHAR_MAX == 0) {
 				object[i].objectType = between(STAR + 1, OBJECT_TYPE_COUNT - 1);
-				object[i].speed = between(objectSpeed[object[i].objectType] - 0.1f, objectSpeed[object[i].objectType] + 0.1f);
+				object[i].speed = between(OBJECT_SPEED[object[i].objectType] - 0.1f, OBJECT_SPEED[object[i].objectType] + 0.1f);
 			}
 			else
 			{
 				object[i].objectType = STAR;
-				object[i].speed = between(objectSpeed[STAR] - 0.1f, objectSpeed[STAR] + 0.1f);
+				object[i].speed = between(OBJECT_SPEED[STAR] - 0.1f, OBJECT_SPEED[STAR] + 0.1f);
 			}
 		}
 	}
