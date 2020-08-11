@@ -1,5 +1,5 @@
 # AlienAlley
-![Screenshot](screenshot.gif)  
+![Screenshot](screenshot.png)
 
 Source port & Mod of the Alien Alley demo game by Dave Roberts.
 
