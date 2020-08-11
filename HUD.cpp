@@ -1,6 +1,5 @@
 #include "HUD.h"
 
-
 HUD::HUD()
 {
     // Initialize everything
@@ -82,10 +81,7 @@ void HUD::draw()
     al_draw_bitmap(HUDBitmap, HUDStartX, HUDStartY, 0);
 
     // Now draw the shield
-    // draw full green bar
-    //al_draw_filled_rectangle(SHIELD_STATUS_LEFT + HUDStartX, SHIELD_STATUS_TOP + HUDStartY, SHIELD_STATUS_RIGHT + HUDStartX, SHIELD_STATUS_BOTTOM + HUDStartY, al_map_rgb(0, 255, 0));
-    // now overlay red bar
-    al_draw_filled_rectangle(SHIELD_STATUS_LEFT + HUDStartX, SHIELD_STATUS_TOP + HUDStartY, SHIELD_STATUS_LEFT + HUDStartX + displayShield, SHIELD_STATUS_BOTTOM + HUDStartY, al_map_rgb(255, 255, 255));
+    al_draw_filled_rectangle(SHIELD_STATUS_LEFT + HUDStartX, SHIELD_STATUS_TOP + HUDStartY, SHIELD_STATUS_LEFT + HUDStartX + displayShield, SHIELD_STATUS_BOTTOM + HUDStartY, al_map_rgb_f(1, (float)displayShield / (float)SHIELD_MAX, (float)lives / (float)LIVES_MAX));
 
     // Now draw the lives
     spacing = lifeBitmapWidth + 2;

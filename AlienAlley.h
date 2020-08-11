@@ -95,6 +95,7 @@ struct SHIP_T
 	int ship_max_x, ship_max_y;
 	int shot_timer;
 	int lives;
+	int shield;
 	int respawn_timer;
 	int invincible_timer;
 };

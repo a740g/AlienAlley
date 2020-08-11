@@ -17,7 +17,8 @@ CelestialObjects::CelestialObjects()
 
 	// First one is a star and just a pixel that is rendered using primitives
 	objectSprite[STAR].bitmap = NULL;
-	objectSprite[STAR].width = objectSprite[STAR].height = 1;
+	objectSprite[STAR].width = 1;
+	objectSprite[STAR].height = 1;
 
 	// Load the remaining sprites
 	objectSprite[GALAXY_1].bitmap = al_load_bitmap("dat/gfx/galaxy1.png");

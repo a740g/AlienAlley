@@ -449,6 +449,7 @@ void ship_init()
 	ship.ship_max_y = screen_height - sprites.ship_d.h;
 	ship.shot_timer = 0;
 	ship.lives = HUD::LIVES_MAX;
+	ship.shield = HUD::SHIELD_MAX;
 	ship.respawn_timer = 0;
 	ship.invincible_timer = 120;
 }
@@ -487,16 +488,23 @@ void ship_update()
 	{
 		if (shots_collide(true, ship.x, ship.y, sprites.ship_d.w, sprites.ship_d.h))
 		{
-			int x = ship.x + (sprites.ship_d.w / 2);
-			int y = ship.y + (sprites.ship_d.h / 2);
-			fx_add(false, x, y);
-			fx_add(false, x + 4, y + 2);
-			fx_add(false, x - 2, y - 4);
-			fx_add(false, x + 1, y - 5);
+			ship.shield -= 2;
+			if (ship.shield <= 0 && ship.lives > 0)
+			{
+				int x = ship.x + (sprites.ship_d.w / 2);
+				int y = ship.y + (sprites.ship_d.h / 2);
+				fx_add(false, x, y);
+				fx_add(false, x + 4, y + 2);
+				fx_add(false, x - 2, y - 4);
+				fx_add(false, x + 1, y - 5);
 
-			ship.lives--;
-			ship.respawn_timer = 90;
-			ship.invincible_timer = 180;
+				ship.lives--;
+				ship.shield = HUD::SHIELD_MAX;
+
+				ship.respawn_timer = 90;
+				ship.invincible_timer = 180;
+			}
+
 		}
 	}
 
@@ -727,13 +735,10 @@ int main()
 	ship_init();
 	aliens_init();
 
-	// TODO: These should created using new and freed using delete
-	// Initizlize celestial objects
-	CelestialObjects celestialObjects;
-	// Initialize main menu
-	MainMenu mainMenu;
-	// Initialize game HUD
-	HUD gameHUD;
+	
+	MainMenu* mainMenu = new MainMenu();							// Initialize main menu
+	CelestialObjects* celestialObjects = new CelestialObjects();	// Initizlize celestial objects
+	HUD* gameHUD = new HUD();										// Initialize game HUD
 
 	frames = 0;
 	score = 0;
@@ -742,8 +747,8 @@ int main()
 	bool redraw = true;
 	ALLEGRO_EVENT event;
 
-	//mainMenu.drawIntroCreditsScreen();
-	//mainMenu.drawTitleScreen();
+	mainMenu->drawTitleScreen();
+	mainMenu->fadeOut();
 
 	al_start_timer(timer);
 
@@ -756,10 +761,10 @@ int main()
 		case ALLEGRO_EVENT_TIMER:
 			fx_update();
 			shots_update();
-			celestialObjects.update(key[ALLEGRO_KEY_UP]);		// TODO: this needs to the input agnostic
+			celestialObjects->update(key[ALLEGRO_KEY_UP]);		// TODO: this needs to the input agnostic
 			ship_update();
 			aliens_update();
-			gameHUD.update(score, ship.lives, gameHUD.SHIELD_MAX);
+			gameHUD->update(score, ship.lives, ship.shield);
 
 			if (key[ALLEGRO_KEY_ESCAPE])
 				done = true;
@@ -782,13 +787,13 @@ int main()
 		{
 			al_clear_to_color(al_map_rgb(0, 0, 0));
 
-			celestialObjects.draw();
+			celestialObjects->draw();
 			aliens_draw();
 			shots_draw();
 			fx_draw();
 			ship_draw();
 
-			gameHUD.draw();
+			gameHUD->draw();
 
 			al_flip_display();
 			redraw = false;
@@ -798,6 +803,9 @@ int main()
 	// Save high scores
 	//TODO: HighScoresSave();
 
+	delete gameHUD;
+	delete celestialObjects;
+	delete mainMenu;
 	sprites_deinit();
 	al_show_mouse_cursor(disp);
 	AudioFinalize();

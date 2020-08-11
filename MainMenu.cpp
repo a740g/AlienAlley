@@ -6,61 +6,13 @@ MainMenu::MainMenu()
 	bufferWidth = al_get_display_width(display);
 	bufferHeight = al_get_display_height(display);
 	bitmap = NULL;
-	bitmapWidth = bitmapHeight = 0;
+	bitmapWidth = 0;
+	bitmapHeight = 0;
 }
 
 MainMenu::~MainMenu()
 {
 	if (bitmap != NULL) al_destroy_bitmap(bitmap);
-}
-
-// Displays the introduction credits
-void MainMenu::drawIntroCreditsScreen()
-{
-	if (bitmap != NULL)
-	{
-		al_destroy_bitmap(bitmap);
-		bitmap = NULL;
-		bitmapWidth = bitmapHeight = 0;
-	}
-
-	// Clear the screen
-	al_clear_to_color(al_map_rgb(0, 0, 0));
-
-	// First page of stuff
-	bitmap = al_load_bitmap("dat/gfx/intro_screen1.png");
-	InitializeCheck(bitmap, "dat/gfx/intro_screen1.png");
-	bitmapWidth = al_get_bitmap_width(bitmap);
-	bitmapHeight = al_get_bitmap_height(bitmap);
-
-	// Stretch bitmap to fill the screen
-	drawScaledBitmap();
-
-	al_destroy_bitmap(bitmap);
-	bitmap = NULL;
-	bitmapWidth = bitmapHeight = 0;
-
-	fadeIn();
-	fadeOut();
-
-	// Clear the screen
-	al_clear_to_color(al_map_rgb(0, 0, 0));
-
-	// Second page of stuff
-	bitmap = al_load_bitmap("dat/gfx/intro_screen2.png");
-	InitializeCheck(bitmap, "dat/gfx/intro_screen2.png");
-	bitmapWidth = al_get_bitmap_width(bitmap);
-	bitmapHeight = al_get_bitmap_height(bitmap);
-
-	// Stretch bitmap to fill the screen
-	drawScaledBitmap();
-
-	al_destroy_bitmap(bitmap);
-	bitmap = NULL;
-	bitmapWidth = bitmapHeight = 0;
-
-	fadeIn();
-	fadeOut();
 }
 
 // Displays the Alien Alley title page
@@ -79,7 +31,8 @@ void MainMenu::drawTitleScreen()
 
 	al_destroy_bitmap(bitmap);
 	bitmap = NULL;
-	bitmapWidth = bitmapHeight = 0;
+	bitmapWidth = 0;
+	bitmapHeight = 0;
 
 	fadeIn();
 }

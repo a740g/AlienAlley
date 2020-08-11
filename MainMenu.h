@@ -30,7 +30,6 @@ public:
 
 	MainMenu();
 	~MainMenu();
-	void drawIntroCreditsScreen();
 	void drawTitleScreen();
 	int userInput();
 	void fadeIn();
