@@ -1,4 +1,4 @@
-#include <math.h>
+#include <cmath>
 
 #include "Point2D.h"
 
@@ -44,11 +44,11 @@ int Point2D::getDistance(const Point2D& p)
 
 bool Point2D::operator ==(const Point2D& p)
 {
-	return (x == p.x && y == p.y);
+	return x == p.x && y == p.y;
 }
 
 
 bool Point2D::operator !=(const Point2D& p)
 {
-	return (x != p.x || y != p.y);
+	return x != p.x || y != p.y;
 }

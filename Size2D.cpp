@@ -1,4 +1,5 @@
-#include <math.h>
+#include <cmath>
+
 #include "Size2D.h"
 
 // Constructor
@@ -36,7 +37,7 @@ bool Size2D::isNothing()
 // What is the diagonal length?
 int Size2D::getDiagonalLength()
 {
-	return sqrt(w * w + h * h);
+	return (int)sqrt(w * w + h * h);
 }
 
 // What is the area?
