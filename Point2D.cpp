@@ -1,8 +1,10 @@
+#include <math.h>
+
 #include "Point2D.h"
 
 Point2D::Point2D(int px, int py)
 {
-	initialize(x, y);
+	initialize(px, py);
 }
 
 

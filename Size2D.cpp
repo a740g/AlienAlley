@@ -1,3 +1,4 @@
+#include <math.h>
 #include "Size2D.h"
 
 // Constructor
@@ -23,50 +24,50 @@ void Size2D::finalize()
 // Is the size valid?
 bool Size2D::isValid()
 {
-	return (w >= 0 && h >= 0);
+	return w >= 0 && h >= 0;
 }
 
 // Returns true of either width or height <= 0
 bool Size2D::isNothing()
 {
-	return (w <= 0 || h <= 0);
+	return w <= 0 || h <= 0;
 }
 
 // What is the diagonal length?
 int Size2D::getDiagonalLength()
 {
-	return (isValid() ? (int)sqrt((float)(w * w + h * h)) : 0);
+	return sqrt(w * w + h * h);
 }
 
 // What is the area?
 int Size2D::getArea()
 {
-	return (isValid() ? w * h : 0);
+	return w * h;
 }
 
 // What is the perimeter
 int Size2D::getPerimeter()
 {
-	return (isValid() ? w * 2 + h * 2 : 0);
+	return w * 2 + h * 2;
 }
 
-// Resizes the width and height
+// Resizes the width and height and returns if the size is valid
 bool Size2D::resize(int x, int y)
 {
 	w += x;
 	h += y;
 
-	return isValid();
+	return w >= 0 && h >= 0;
 }
 
 // Are two sizes equal?
 bool Size2D::operator ==(const Size2D &s)
 {
-	return (w == s.w && h == s.h);
+	return w == s.w && h == s.h;
 }
 
 // Are to sizes not equal?
 bool Size2D::operator !=(const Size2D &s)
 {
-	return (w != s.w || h != s.h);
+	return w != s.w || h != s.h;
 }

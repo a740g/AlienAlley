@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "Rect2D.h"
 
 

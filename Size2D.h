@@ -1,7 +1,5 @@
 #pragma once
 
-#include "AlienAlley.h"
-
 // 2D Size class
 class Size2D
 {

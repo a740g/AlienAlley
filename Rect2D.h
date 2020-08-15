@@ -1,11 +1,15 @@
 #pragma once
 
-#include "AlienAlley.h"
+#include "Size2D.h"
+#include "Point2D.h"
 
 // 2D Rect class
 class Rect2D
 {
 public:
+    friend class Point2D;
+    friend class Size2D;
+
     // Rectangle
     Point2D a;      // top
     Point2D b;      // bottom

@@ -157,6 +157,7 @@
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Point2D.cpp" />
+    <ClCompile Include="Rect2D.cpp" />
     <ClCompile Include="Size2D.cpp" />
   </ItemGroup>
   <ItemGroup>
