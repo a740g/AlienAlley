@@ -9,6 +9,7 @@ class Point2D;
 class Rect2D
 {
 public:
+
     // Win32 RECT
     RECT rect;
 

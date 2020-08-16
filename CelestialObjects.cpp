@@ -15,7 +15,7 @@ CelestialObjects::CelestialObjects()
 	// Load game assets
 
 	// First one is a star and just a pixel that is rendered using primitives
-	objectSprite[STAR].bitmap = NULL;
+	objectSprite[STAR].bitmap = nullptr;
 	objectSprite[STAR].width = 1;
 	objectSprite[STAR].height = 1;
 
@@ -99,7 +99,7 @@ CelestialObjects::~CelestialObjects()
 	// Free all the sprites
 	for (int i = 0; i < OBJECT_TYPE_COUNT; i++)
 	{
-		if (objectSprite[i].bitmap != NULL) al_destroy_bitmap(objectSprite[i].bitmap);
+		if (objectSprite[i].bitmap != nullptr) al_destroy_bitmap(objectSprite[i].bitmap);
 	}
 
 	// Free the object array

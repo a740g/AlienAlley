@@ -13,7 +13,7 @@
 #include "AlienAlley.h"
 
 unsigned char key[ALLEGRO_KEY_MAX];						// Key state array
-ALLEGRO_DISPLAY* disp = NULL;							// Allegro display
+ALLEGRO_DISPLAY* disp = nullptr;						// Allegro display
 int screen_width = 640;									// Screen width - this is updated later
 int screen_height = 480;								// Screen height - this is updated later
 long frames;											// How many frame did we render?
@@ -34,7 +34,7 @@ void InitializeCheck(bool test, const char* description)
 {
 	if (test) return;
 
-	al_show_native_message_box(disp, "Error", "Failed to initialize:", description, NULL, ALLEGRO_MESSAGEBOX_ERROR);
+	al_show_native_message_box(disp, "Error", "Failed to initialize:", description, nullptr, ALLEGRO_MESSAGEBOX_ERROR);
 
 	exit(EXIT_FAILURE);
 }
@@ -218,7 +218,7 @@ void fx_init()
 void fx_add(bool spark, int x, int y)
 {
 	if (!spark)
-		al_play_sample(sample_explode[between(0, 2)], 0.75, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+		al_play_sample(sample_explode[between(0, 2)], 0.75, 0, 1, ALLEGRO_PLAYMODE_ONCE, nullptr);
 
 	for (int i = 0; i < FX_N; i++)
 	{
@@ -283,7 +283,7 @@ bool shots_add(bool is_ship, bool straight, int x, int y)
 		0,
 		is_ship ? 1.0 : between(1.5f, 1.6f),
 		ALLEGRO_PLAYMODE_ONCE,
-		NULL
+		nullptr
 	);
 
 	for (int i = 0; i < SHOTS_N; i++)
@@ -686,13 +686,13 @@ int main()
 
 	InitializeCheck(al_install_keyboard(), "keyboard");
 
-	ALLEGRO_TIMER* timer = al_create_timer(1.0 / 60.0);
+	disp_init();
+
+	ALLEGRO_TIMER* timer = al_create_timer(1.0 / max(max(al_get_display_refresh_rate(disp), al_get_new_display_refresh_rate()), 60.0));
 	InitializeCheck(timer, "timer");
 
 	ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
 	InitializeCheck(queue, "queue");
-
-	disp_init();
 
 	/* load high-score file */
 	//TODO: HighScoresLoad()

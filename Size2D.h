@@ -6,6 +6,7 @@
 class Size2D
 {
 public:
+
     // Win32 SIZE
     SIZE size;
 

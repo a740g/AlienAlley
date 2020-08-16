@@ -5,14 +5,14 @@ MainMenu::MainMenu()
 	display = al_get_current_display();
 	bufferWidth = al_get_display_width(display);
 	bufferHeight = al_get_display_height(display);
-	bitmap = NULL;
+	bitmap = nullptr;
 	bitmapWidth = 0;
 	bitmapHeight = 0;
 }
 
 MainMenu::~MainMenu()
 {
-	if (bitmap != NULL) al_destroy_bitmap(bitmap);
+	if (bitmap != nullptr) al_destroy_bitmap(bitmap);
 }
 
 // Displays the Alien Alley title page
@@ -30,7 +30,7 @@ void MainMenu::drawTitleScreen()
 	drawScaledBitmap();
 
 	al_destroy_bitmap(bitmap);
-	bitmap = NULL;
+	bitmap = nullptr;
 	bitmapWidth = 0;
 	bitmapHeight = 0;
 

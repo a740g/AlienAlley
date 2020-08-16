@@ -92,7 +92,7 @@ void HUD::draw()
     j = 0;
     for (i = DIGITS_MAX - 1; i >= 0 ; i--)
     {
-        digit = displayScore / NUMBER_TABLE[i] % 10;
+        digit = getDigit(displayScore, i);
         al_draw_bitmap_region(digitSpriteSheet, digit * digitSpriteWidth, 0, digitSpriteWidth, digitSpriteHeight, SCORE_NUMBERS_LEFT + HUDStartX + j * digitSpriteWidth, SCORE_NUMBERS_TOP + HUDStartY, 0);
         j++;
     }
@@ -100,4 +100,22 @@ void HUD::draw()
     // Finally draw game over message is no lives are left
     if (lives <= 0)
         al_draw_text(font, al_map_rgb_f(1, 1, 1), bufferWidth / 2, bufferHeight / 2, ALLEGRO_ALIGN_CENTER, "G A M E  O V E R");
+}
+
+int HUD::getDigit(int n, int p)
+{
+	switch (p) {
+    case 0: break;
+	case 1: n /= 10; break;
+	case 2: n /= 100; break;
+	case 3: n /= 1000; break;
+	case 4: n /= 10000; break;
+	case 5: n /= 100000; break;
+	case 6: n /= 1000000; break;
+	case 7: n /= 10000000; break;
+	case 8: n /= 100000000; break;
+	case 9: n /= 1000000000; break;
+	default: InitializeCheck(false, __FUNCTION__": position not handled");
+	}
+	return n % 10;
 }

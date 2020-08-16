@@ -8,6 +8,7 @@ class Size2D;
 class Point2D
 {
 public:
+
     // Win32 POINT
     POINT point;
 
