@@ -494,7 +494,7 @@ void ship_update()
 
 	if (ship.shot_timer)
 		ship.shot_timer--;
-	else if (key[ALLEGRO_KEY_X])
+	else if (key[ALLEGRO_KEY_LCTRL] || key[ALLEGRO_KEY_SPACE] || key[ALLEGRO_KEY_RCTRL])
 	{
 		int x = ship.x + (sprites.ship_d.w / 2);
 		if (shots_add(true, false, x, ship.y))

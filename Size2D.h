@@ -6,9 +6,8 @@
 class Size2D
 {
 public:
-    // Rectange dimension
-    int w;
-    int h;
+    // Win32 SIZE
+    SIZE size;
 
     Size2D(int cx = 0, int cy = 0);				// create from two integers
 

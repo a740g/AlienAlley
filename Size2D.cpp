@@ -9,64 +9,64 @@ Size2D::Size2D(int cx, int cy)
 // Set values of width and height
 void Size2D::initialize(int cx, int cy)
 {
-	w = cx;
-	h = cy;
+	size.cx = cx;
+	size.cy = cy;
 }
 
 // Resets values of width and height
 void Size2D::finalize()
 {
-	w = 0;
-	h = 0;
+	size.cx = 0;
+	size.cy = 0;
 }
 
 // Is the size valid?
 bool Size2D::isValid()
 {
-	return w >= 0 && h >= 0;
+	return size.cx >= 0 && size.cy >= 0;
 }
 
 // Returns true of either width or height <= 0
 bool Size2D::isNothing()
 {
-	return w <= 0 || h <= 0;
+	return size.cx <= 0 || size.cy <= 0;
 }
 
 // What is the diagonal length?
 int Size2D::getDiagonalLength()
 {
-	return (int)sqrt(w * w + h * h);
+	return (int)sqrt(size.cx * size.cx + size.cy * size.cy);
 }
 
 // What is the area?
 int Size2D::getArea()
 {
-	return w * h;
+	return size.cx * size.cy;
 }
 
 // What is the perimeter
 int Size2D::getPerimeter()
 {
-	return w * 2 + h * 2;
+	return size.cx * 2 + size.cy * 2;
 }
 
 // Resizes the width and height and returns if the size is valid
 bool Size2D::resize(int x, int y)
 {
-	w += x;
-	h += y;
+	size.cx += x;
+	size.cy += y;
 
-	return w >= 0 && h >= 0;
+	return size.cx >= 0 && size.cy >= 0;
 }
 
 // Are two sizes equal?
 bool Size2D::operator ==(const Size2D &s)
 {
-	return w == s.w && h == s.h;
+	return size.cx == s.size.cx && size.cy == s.size.cy;
 }
 
 // Are to sizes not equal?
 bool Size2D::operator !=(const Size2D &s)
 {
-	return w != s.w || h != s.h;
+	return size.cx != s.size.cx || size.cy != s.size.cy;
 }

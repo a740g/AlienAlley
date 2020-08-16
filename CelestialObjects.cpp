@@ -1,6 +1,5 @@
 #include "CelestialObjects.h"
 
-
 CelestialObjects::CelestialObjects()
 {
 	// Initialize the buffer width and height

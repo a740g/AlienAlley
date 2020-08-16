@@ -71,7 +71,6 @@ void HUD::update(int gameScore, int gameLives, int gameShield)
     }
 }
 
-
 // Draws the game HUD on the framebuffer
 void HUD::draw()
 {

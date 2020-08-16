@@ -8,9 +8,8 @@ class Size2D;
 class Point2D
 {
 public:
-    // Absolute 2D coordinates
-    int x;
-    int y;
+    // Win32 POINT
+    POINT point;
 
     Point2D(int px = 0, int py = 0);
 

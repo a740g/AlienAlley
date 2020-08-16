@@ -5,47 +5,40 @@ Point2D::Point2D(int px, int py)
 	initialize(px, py);
 }
 
-
 void Point2D::initialize(int px, int py)
 {
-	x = px;
-	y = py;
+	point.x = px;
+	point.y = py;
 }
-
 
 void Point2D::finalize()
 {
-	x = 0;
-	y = 0;
+	point.x = 0;
+	point.y = 0;
 }
-
 
 void Point2D::offset(int ox, int oy)
 {
-	x += ox;
-	y += oy;
+	point.x += ox;
+	point.y += oy;
 }
-
 
 Size2D Point2D::getXYDistance(const Point2D& p)
 {
-	return Size2D(1 + abs(p.x - x), 1 + abs(p.y - y));
+	return Size2D(1 + abs(p.point.x - point.x), 1 + abs(p.point.y - point.y));
 }
-
 
 int Point2D::getDistance(const Point2D& p)
 {
 	return getXYDistance(p).getDiagonalLength();
 }
 
-
 bool Point2D::operator ==(const Point2D& p)
 {
-	return x == p.x && y == p.y;
+	return point.x == p.point.x && point.y == p.point.y;
 }
-
 
 bool Point2D::operator !=(const Point2D& p)
 {
-	return x != p.x || y != p.y;
+	return point.x != p.point.x || point.y != p.point.y;
 }

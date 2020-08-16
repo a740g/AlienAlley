@@ -9,9 +9,8 @@ class Point2D;
 class Rect2D
 {
 public:
-    // Rectangle
-    Point2D a;      // top-left
-    Point2D b;      // bottom-right
+    // Win32 RECT
+    RECT rect;
 
     Rect2D(int ax = 0, int ay = 0, int bx = 0, int by = 0);
     Rect2D(const Point2D& p1, const Point2D& p2);
@@ -39,6 +38,7 @@ public:
     void move(const Point2D& p);
     void makeIntersection(const Rect2D& r);
     void makeUnion(const Rect2D& r);
+    void subtract(const Rect2D& r);
     bool intersects(const Rect2D& r);
     bool contains(int p, int y);
     bool contains(const Point2D& p);

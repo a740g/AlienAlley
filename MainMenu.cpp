@@ -37,14 +37,12 @@ void MainMenu::drawTitleScreen()
 	fadeIn();
 }
 
-
 // Returns the user input on the title screen
 int MainMenu::userInput()
 {
     // TODO: Add your implementation code here.
     return 0;
 }
-
 
 void MainMenu::fadeIn()
 {
@@ -61,7 +59,6 @@ void MainMenu::fadeIn()
 
 	al_destroy_bitmap(tempBitmap);
 }
-
 
 void MainMenu::fadeOut()
 {
