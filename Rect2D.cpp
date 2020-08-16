@@ -1,5 +1,3 @@
-#include <algorithm>
-
 #include "Rect2D.h"
 
 
@@ -59,33 +57,21 @@ void Rect2D::finalize()
 
 bool Rect2D::isValid()
 {
-	return (b.x >= a.x && b.y >= a.y);
+	return b.x >= a.x && b.y >= a.y;
 }
 
 
 void Rect2D::normalize()
 {
-	int i;
-
-	if (b.x < a.x)
-	{
-		i = b.x;
-		b.x = a.x;
-		a.x = i;
-	}
+	if (a.x > b.x) std::swap(a.x, b.x);
 	
-	if (b.y < a.y)
-	{
-		i = b.y;
-		b.y = a.y;
-		a.y = i;
-	}
+	if (a.y > b.y) std::swap(a.y, b.y);
 }
 
 
 bool Rect2D::isEmpty()
 {
-	return ((a.x >= b.x) || (a.y >= b.y));
+	return (a.x >= b.x) || (a.y >= b.y);
 }
 
 
@@ -159,7 +145,7 @@ int Rect2D::getPerimeter()
 
 bool Rect2D::overlaps(const Rect2D &r)
 {
-	return (!(a.x > r.b.x || r.a.x > b.x || a.y > r.b.y || r.a.y > b.y));
+	return !(a.x > r.b.x || r.a.x > b.x || a.y > r.b.y || r.a.y > b.y);
 }
 
 
@@ -183,46 +169,46 @@ void Rect2D::move(const Point2D &p)
 
 void Rect2D::makeIntersection(const Rect2D &r)
 {
-	a.x = std::max(a.x, r.a.x);
-	a.y = std::max(a.y, r.a.y);
-	b.x = std::min(b.x, r.b.x);
-	b.y = std::min(b.y, r.b.y);
+	a.x = max(a.x, r.a.x);
+	a.y = max(a.y, r.a.y);
+	b.x = min(b.x, r.b.x);
+	b.y = min(b.y, r.b.y);
 }
 
 
 void Rect2D::makeUnion(const Rect2D &r)
 {
-	a.x = std::min(a.x, r.a.x);
-	a.y = std::min(a.y, r.a.y);
-	b.x = std::max(b.x, r.b.x);
-	b.y = std::max(b.y, r.b.y);
+	a.x = min(a.x, r.a.x);
+	a.y = min(a.y, r.a.y);
+	b.x = max(b.x, r.b.x);
+	b.y = max(b.y, r.b.y);
 }
 
 bool Rect2D::intersects(const Rect2D& r)
 {
-	return (a.x < r.b.x && b.x > r.a.x && a.y < r.b.y && b.y > r.a.y);
+	return a.x < r.b.x && b.x > r.a.x && a.y < r.b.y && b.y > r.a.y;
 }
 
 bool Rect2D::contains(int x, int y) {
-	return (x >= a.x && x < b.x && y >= a.y && y < b.y);
+	return x >= a.x && x < b.x && y >= a.y && y < b.y;
 }
 
 
 bool Rect2D::contains(const Point2D &p) {
-	return (p.x >= a.x && p.x < b.x && p.y >= a.y && p.y < b.y);
+	return p.x >= a.x && p.x < b.x && p.y >= a.y && p.y < b.y;
 }
 
 
 bool Rect2D::contains(const Rect2D &r) {
-	return (r.a.x >= a.x && r.a.y >= a.y && r.b.x <= b.x && r.b.y <= b.y);
+	return r.a.x >= a.x && r.a.y >= a.y && r.b.x <= b.x && r.b.y <= b.y;
 }
 
 
 bool Rect2D::operator ==(const Rect2D &r) {
-	return (a == r.a && b == r.b);
+	return a == r.a && b == r.b;
 }
 
 
 bool Rect2D::operator !=(const Rect2D &r) {
-	return !(*this == r);
+	return a != r.a || b != r.b;
 }

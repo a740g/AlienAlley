@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Size2D.h"
+#include "AlienAlley.h"
+
+class Size2D;
 
 // 2D Point class
 class Point2D
 {
-    friend class Size2D;
-
 public:
     // Absolute 2D coordinates
     int x;

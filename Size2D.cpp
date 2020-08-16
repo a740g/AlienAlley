@@ -1,5 +1,3 @@
-#include <cmath>
-
 #include "Size2D.h"
 
 // Constructor

@@ -1,5 +1,3 @@
-#include <cmath>
-
 #include "Point2D.h"
 
 Point2D::Point2D(int px, int py)
@@ -12,7 +10,6 @@ void Point2D::initialize(int px, int py)
 {
 	x = px;
 	y = py;
-
 }
 
 

@@ -1,6 +1,8 @@
 #pragma once
 
-// Allegro 5 stuff
+#include <Windows.h>
+#include <cmath>
+#include <algorithm>
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
@@ -8,8 +10,6 @@
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_native_dialog.h>
-
-// Game class files
 #include "Size2D.h"
 #include "Point2D.h"
 #include "Rect2D.h"
