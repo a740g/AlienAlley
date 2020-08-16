@@ -156,9 +156,6 @@
     <ClCompile Include="CelestialObjects.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="MainMenu.cpp" />
-    <ClCompile Include="Point2D.cpp" />
-    <ClCompile Include="Rect2D.cpp" />
-    <ClCompile Include="Size2D.cpp" />
     <ClCompile Include="Sprite.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -172,10 +169,7 @@
     <ClInclude Include="CelestialObjects.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="MainMenu.h" />
-    <ClInclude Include="Point2D.h" />
-    <ClInclude Include="Rect2D.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Size2D.h" />
     <ClInclude Include="Sprite.h" />
   </ItemGroup>
   <ItemGroup>

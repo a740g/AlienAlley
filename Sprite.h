@@ -7,9 +7,9 @@ class Sprite
 public:
 
 	std::vector<ALLEGRO_BITMAP*> frameList;			// sprite frame bitmaps
-	Size2D size;									// sprite size
+	CSize size;										// sprite size
 	int frames;										// total frames
-	Point2D position;								// position of sprite on 2D plane
+	CPoint position;								// position of sprite on 2D plane
 	int currentFrame;								// current sprite frame
 	int animationDirection;							// animation driection (can be -ve or +ve)
 		

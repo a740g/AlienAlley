@@ -1,10 +1,6 @@
 #pragma once
 
-#include <Windows.h>
-#include <cstddef>
-#include <memory>
-#include <cmath>
-#include <algorithm>
+#include <atltypes.h>
 #include <vector>
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
@@ -13,9 +9,6 @@
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_native_dialog.h>
-#include "Size2D.h"
-#include "Point2D.h"
-#include "Rect2D.h"
 #include "CelestialObjects.h"
 #include "MainMenu.h"
 #include "HUD.h"
