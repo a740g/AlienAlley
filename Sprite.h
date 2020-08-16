@@ -6,13 +6,13 @@ class Sprite
 {
 public:
 
-	Size2D size;
-	Point2D position;
-	int frames;
-	int currentFrame;
-	int animationDirection;
-	std::vector<ALLEGRO_BITMAP*> frameList;
-	
+	std::vector<ALLEGRO_BITMAP*> frameList;			// sprite frame bitmaps
+	Size2D size;									// sprite size
+	int frames;										// total frames
+	Point2D position;								// position of sprite on 2D plane
+	int currentFrame;								// current sprite frame
+	int animationDirection;							// animation driection (can be -ve or +ve)
+		
 	Sprite(const char* fname = nullptr, int width = 0, int height = 0, int rows = 1, int columns = 1);
 	~Sprite();
 	bool loadBitmap(const char* fname, int width = 0, int height = 0, int rows = 1, int columns = 1);
