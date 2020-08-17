@@ -12,19 +12,21 @@
 
 #pragma once
 
-#include <atltypes.h>
-#include <allegro5/allegro5.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_audio.h>
-#include <allegro5/allegro_acodec.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_native_dialog.h>
-#include "CelestialObjects.h"
-#include "MainMenu.h"
-#include "HUD.h"
-#include "Effects.h"
+#include "AlienAlley.h"
 
-void InitializeCheck(bool test, const char* description);
-int between(int lo, int hi);
-float between(float lo, float hi);
+constexpr auto EXPLOSION_FRAMES = 5;
+constexpr auto SPARKS_FRAMES = 3;
+constexpr auto FX_N = 128;
+
+struct FX_T
+{
+	int x, y;
+	int frame;
+	bool spark;
+	bool used;
+};
+
+class Effects
+{
+};
+

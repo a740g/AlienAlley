@@ -1,21 +1,35 @@
+///////////////////////////////////////////////////////////////////////
+//     _    _ _                 _    _ _
+//    / \  | (_) ___ _ __      / \  | | | ___ _   _ 
+//   / _ \ | | |/ _ \ '_ \    / _ \ | | |/ _ \ | | |
+//  / ___ \| | |  __/ | | |  / ___ \| | |  __/ |_| |
+// /_/   \_\_|_|\___|_| |_| /_/   \_\_|_|\___|\__, |
+//                                            |___/
+//
+//  Conversion/port copyright © Samuel Gomes & Neil Gomes, 1998-2020.
+//
+///////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 #include "AlienAlley.h"
 
 class Sprite
 {
+private:
+	ALLEGRO_BITMAP* spriteSheet;					// pointer to sprite frame bitmaps
+	CSize size;										// sprite size
+	CSize frames;									// total frames (cx * cy)
+	int currentFrame;								// current sprite frame
+
 public:
 
-	std::vector<ALLEGRO_BITMAP*> frameList;			// sprite frame bitmaps
-	CSize size;										// sprite size
-	int frames;										// total frames
 	CPoint position;								// position of sprite on 2D plane
-	int currentFrame;								// current sprite frame
 	int animationDirection;							// animation driection (can be -ve or +ve)
 		
-	Sprite(const char* fname = nullptr, int width = 0, int height = 0, int rows = 1, int columns = 1);
+	Sprite(ALLEGRO_BITMAP* ssBitmap = nullptr, int width = 0, int height = 0);
 	~Sprite();
-	bool loadBitmap(const char* fname, int width = 0, int height = 0, int rows = 1, int columns = 1);
+	bool setBitmap(ALLEGRO_BITMAP* ssBitmap, int width = 0, int height = 0);
 	bool collidesWith(const Sprite& s);
 	void draw(int flags = 0);
 	void nextFrame();

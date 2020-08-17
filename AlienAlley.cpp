@@ -12,6 +12,77 @@
 
 #include "AlienAlley.h"
 
+constexpr auto KEY_SEEN = 1;							// Key see and released flags
+constexpr auto KEY_RELEASED = 2;
+constexpr auto SHOTS_N = 128;
+constexpr auto SHIP_SPEED = 3;
+constexpr auto ALIENS_N = 8;
+
+// Types of aliens
+enum ALIEN_TYPE_T
+{
+	ALIEN_TYPE_BUG = 0,
+	ALIEN_TYPE_ARROW,
+	//ALIEN_TYPE_BOP,
+	ALIEN_TYPE_THICCBOI,
+	ALIEN_TYPE_N
+};
+
+// Rectange dimension
+struct DIM_T
+{
+	int w;
+	int h;
+};
+
+struct SPRITES_T
+{
+	ALLEGRO_BITMAP* ship;
+	DIM_T ship_d;
+
+	ALLEGRO_BITMAP* ship_shot[2];
+	DIM_T ship_shot_d;
+
+	ALLEGRO_BITMAP* alien[ALIEN_TYPE_N];
+	DIM_T alien_d[ALIEN_TYPE_N];
+
+	ALLEGRO_BITMAP* alien_shot;
+	DIM_T alien_shot_d;
+
+	ALLEGRO_BITMAP* explosion;
+	ALLEGRO_BITMAP* sparks;
+	ALLEGRO_BITMAP* powerup;
+};
+
+struct SHOT_T
+{
+	int x, y, dx, dy;
+	int frame;
+	bool ship;
+	bool used;
+};
+
+struct SHIP_T
+{
+	int x, y;
+	int ship_max_x, ship_max_y;
+	int shot_timer;
+	int lives;
+	int shield;
+	int respawn_timer;
+	int invincible_timer;
+};
+
+struct ALIEN_T
+{
+	int x, y;
+	ALIEN_TYPE_T type;
+	int shot_timer;
+	int blink;
+	int life;
+	bool used;
+};
+
 unsigned char key[ALLEGRO_KEY_MAX];						// Key state array
 ALLEGRO_DISPLAY* disp = nullptr;						// Allegro display
 int screen_width = 640;									// Screen width - this is updated later
@@ -22,7 +93,6 @@ ALLEGRO_SAMPLE* sample_shot;
 ALLEGRO_SAMPLE* sample_explode[2];
 ALLEGRO_AUDIO_STREAM* music;
 SPRITES_T sprites;
-FX_T fx[FX_N];
 SHOT_T shots[SHOTS_N];
 SHIP_T ship;
 ALIEN_T aliens[ALIENS_N];
@@ -205,66 +275,6 @@ void AudioFinalize()
 	al_destroy_sample(sample_explode[0]);
 	al_destroy_sample(sample_explode[1]);
 	al_destroy_audio_stream(music);
-}
-
-// --- fx ---
-
-void fx_init()
-{
-	for (int i = 0; i < FX_N; i++)
-		fx[i].used = false;
-}
-
-void fx_add(bool spark, int x, int y)
-{
-	if (!spark)
-		al_play_sample(sample_explode[between(0, 2)], 0.75, 0, 1, ALLEGRO_PLAYMODE_ONCE, nullptr);
-
-	for (int i = 0; i < FX_N; i++)
-	{
-		if (fx[i].used)
-			continue;
-
-		fx[i].x = x;
-		fx[i].y = y;
-		fx[i].frame = 0;
-		fx[i].spark = spark;
-		fx[i].used = true;
-		return;
-	}
-}
-
-void fx_update()
-{
-	for (int i = 0; i < FX_N; i++)
-	{
-		if (!fx[i].used)
-			continue;
-
-		fx[i].frame++;
-
-		if ((!fx[i].spark && (fx[i].frame == (EXPLOSION_FRAMES * 2)))
-			|| (fx[i].spark && (fx[i].frame == (SPARKS_FRAMES * 2)))
-			)
-			fx[i].used = false;
-	}
-}
-
-void fx_draw()
-{
-	for (int i = 0; i < FX_N; i++)
-	{
-		if (!fx[i].used)
-			continue;
-
-		int frame_display = fx[i].frame / 2;
-		ALLEGRO_BITMAP* bmp = fx[i].spark ? sprites.sparks : sprites.explosion;
-
-		int frame_side_size = al_get_bitmap_height(bmp);	// since each fx frame width & height are the same
-		int x = fx[i].x - (frame_side_size / 2);
-		int y = fx[i].y - (frame_side_size / 2);
-		al_draw_bitmap_region(bmp, frame_display * frame_side_size, 0, frame_side_size, frame_side_size, x, y, 0);
-	}
 }
 
 // --- shots ---
