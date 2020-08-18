@@ -49,8 +49,6 @@ struct SPRITES_T
 	ALLEGRO_BITMAP* alien_shot;
 	DIM_T alien_shot_d;
 
-	ALLEGRO_BITMAP* explosion;
-	ALLEGRO_BITMAP* sparks;
 	ALLEGRO_BITMAP* powerup;
 };
 
@@ -90,12 +88,15 @@ int screen_height = 480;								// Screen height - this is updated later
 long frames;											// How many frame did we render?
 long score;												// What is the player score?
 ALLEGRO_SAMPLE* sample_shot;
-ALLEGRO_SAMPLE* sample_explode[2];
 ALLEGRO_AUDIO_STREAM* music;
 SPRITES_T sprites;
 SHOT_T shots[SHOTS_N];
 SHIP_T ship;
 ALIEN_T aliens[ALIENS_N];
+MainMenu* mainMenu;
+CelestialObjects* celestialObjects;
+HUD* gameHUD;
+Effects* FX;
 
 
 // Check if a Allegro/pogram initialization succeeded
@@ -208,12 +209,6 @@ void sprites_init()
 	sprites.alien_shot_d.w = al_get_bitmap_width(sprites.alien_shot);
 	sprites.alien_shot_d.h = al_get_bitmap_height(sprites.alien_shot);
 
-	sprites.explosion = al_load_bitmap("dat/gfx/explosion_small_ss.png");
-	InitializeCheck(sprites.explosion, "dat/gfx/explosion_small_ss.png");
-
-	sprites.sparks = al_load_bitmap("dat/gfx/sparks_ss.png");
-	InitializeCheck(sprites.sparks, "dat/gfx/sparks_ss.png");
-
 	sprites.powerup = al_load_bitmap("dat/gfx/powerup_ss.png");
 	InitializeCheck(sprites.powerup, "dat/gfx/powerup_ss.png");
 }
@@ -228,10 +223,6 @@ void sprites_deinit()
 	al_destroy_bitmap(sprites.alien[0]);
 	al_destroy_bitmap(sprites.alien[1]);
 	al_destroy_bitmap(sprites.alien[2]);
-
-	al_destroy_bitmap(sprites.sparks);
-
-	al_destroy_bitmap(sprites.explosion);
 
 	al_destroy_bitmap(sprites.powerup);
 }
@@ -249,13 +240,8 @@ void AudioInitialize()
 	al_init_acodec_addon();
 	al_reserve_samples(128);
 
-	sample_shot = al_load_sample("dat/snd/sfx/alien_shot.flac");
-	InitializeCheck(sample_shot, "dat/snd/sfx/alien_shot.flac");
-
-	sample_explode[0] = al_load_sample("dat/snd/sfx/alien_explosion_small.flac");
-	InitializeCheck(sample_explode[0], "dat/snd/sfx/alien_explosion_small.flac");
-	sample_explode[1] = al_load_sample("dat/snd/sfx/alien_explosion_big.flac");
-	InitializeCheck(sample_explode[1], "dat/snd/sfx/alien_explosion_big.flac");
+	sample_shot = al_load_sample("dat/snd/sfx/shot.flac");
+	InitializeCheck(sample_shot, "dat/snd/sfx/shot.flac");
 
 	// Streaming music playback
 	music = al_load_audio_stream("dat/snd/mus/alien_main.opus", 2, 2048);
@@ -272,8 +258,7 @@ void AudioInitialize()
 void AudioFinalize()
 {
 	al_destroy_sample(sample_shot);
-	al_destroy_sample(sample_explode[0]);
-	al_destroy_sample(sample_explode[1]);
+
 	al_destroy_audio_stream(music);
 }
 
@@ -401,7 +386,7 @@ bool shots_collide(bool is_ship, int x, int y, int w, int h)
 
 		if (collide(x, y, x + w, y + h, shots[i].x, shots[i].y, shots[i].x + sw, shots[i].y + sh))
 		{
-			fx_add(true, shots[i].x + (sw / 2), shots[i].y + (sh / 2));
+			FX->add(FX->SPARKS, shots[i].x + (sw / 2), shots[i].y + (sh / 2));
 			shots[i].used = false;
 			return true;
 		}
@@ -487,10 +472,7 @@ void ship_update()
 			{
 				int x = ship.x + (sprites.ship_d.w / 2);
 				int y = ship.y + (sprites.ship_d.h / 2);
-				fx_add(false, x, y);
-				fx_add(false, x + 4, y + 2);
-				fx_add(false, x - 2, y - 4);
-				fx_add(false, x + 1, y - 5);
+				FX->add(FX->EXPLOSION_SMALL, x, y);
 
 				ship.lives--;
 				ship.shield = HUD::SHIELD_MAX;
@@ -615,23 +597,21 @@ void aliens_update()
 
 		if (aliens[i].life <= 0)
 		{
-			fx_add(false, cx, cy);
-
 			switch (aliens[i].type)
 			{
 			case ALIEN_TYPE_BUG:
 				score += 20;
+				FX->add(FX->EXPLOSION_TINY, cx, cy);
 				break;
 
 			case ALIEN_TYPE_ARROW:
 				score += 15;
+				FX->add(FX->EXPLOSION_TINY, cx, cy);
 				break;
 
 			case ALIEN_TYPE_THICCBOI:
 				score += 80;
-				fx_add(false, cx - 10, cy - 4);
-				fx_add(false, cx + 4, cy + 10);
-				fx_add(false, cx + 8, cy + 8);
+				FX->add(FX->EXPLOSION_BIG, cx, cy);
 				break;
 			}
 
@@ -724,15 +704,15 @@ int main()
 
 	keyboard_init();
 	al_hide_mouse_cursor(disp);		// TODO: we need to move this to a good place later
-	fx_init();
 	shots_init();
 	ship_init();
 	aliens_init();
 
 	
-	MainMenu* mainMenu = new MainMenu();							// Initialize main menu
-	CelestialObjects* celestialObjects = new CelestialObjects();	// Initizlize celestial objects
-	HUD* gameHUD = new HUD();										// Initialize game HUD
+	mainMenu = new MainMenu();							// Initialize main menu
+	celestialObjects = new CelestialObjects();			// Initizlize celestial objects
+	gameHUD = new HUD();								// Initialize game HUD
+	FX = new Effects();									// Initialize effects
 
 	frames = 0;
 	score = 0;
@@ -753,7 +733,7 @@ int main()
 		switch (event.type)
 		{
 		case ALLEGRO_EVENT_TIMER:
-			fx_update();
+			FX->update();
 			shots_update();
 			celestialObjects->update(key[ALLEGRO_KEY_UP]);		// TODO: this needs to the input agnostic
 			ship_update();
@@ -784,7 +764,7 @@ int main()
 			celestialObjects->draw();
 			aliens_draw();
 			shots_draw();
-			fx_draw();
+			FX->draw();
 			ship_draw();
 
 			gameHUD->draw();
@@ -797,6 +777,7 @@ int main()
 	// Save high scores
 	//TODO: HighScoresSave();
 
+	delete FX;
 	delete gameHUD;
 	delete celestialObjects;
 	delete mainMenu;

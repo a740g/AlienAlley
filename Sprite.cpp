@@ -12,19 +12,21 @@
 
 #include "Sprite.h"
 
-Sprite::Sprite(ALLEGRO_BITMAP* ssBitmap, int width, int height)
-{
-	reset();
-	setBitmap(ssBitmap, width, height);
-}
-
-Sprite::~Sprite()
+Sprite::Sprite()
 {
 	reset();
 }
 
-bool Sprite::setBitmap(ALLEGRO_BITMAP* ssBitmap, int width, int height)
+//Sprite::Sprite(ALLEGRO_BITMAP* ssBitmap, int width, int height, int frameSkip)
+//{
+//	setBitmap(ssBitmap, width, height, frameSkip);
+//}
+
+bool Sprite::setBitmap(ALLEGRO_BITMAP* ssBitmap, int width, int height, int frameSkip)
 {
+	// We can safely do this because our sprite class does not manage bitmaps
+	reset();
+
 	if (ssBitmap == nullptr) return false;
 	spriteSheet = ssBitmap;
 
@@ -43,6 +45,8 @@ bool Sprite::setBitmap(ALLEGRO_BITMAP* ssBitmap, int width, int height)
 	}
 
 	currentFrame = 0;
+	frameSkipMax = frameSkip;
+	frameSkipCount = 0;
 	return false;
 }
 
@@ -71,12 +75,26 @@ void Sprite::draw(int flags)
 	al_draw_bitmap_region(spriteSheet, (currentFrame % frames.cx) * size.cx, (currentFrame / frames.cx) * size.cy, size.cx, size.cy, position.x, position.y, flags);
 }
 
-void Sprite::nextFrame()
+void Sprite::update()
 {
+	// Skip frames if user has set frameSkip
+	frameSkipCount++;
+	if (frameSkipCount < frameSkipMax) return;
+
+	// Else, we process the update cycle
+	frameSkipCount = 0;
 	currentFrame += animationDirection;
 
-	if (currentFrame >= frames.cx * frames.cy) currentFrame = 0;
-	if (currentFrame < 0) currentFrame = frames.cx * frames.cy - 1;
+	if (currentFrame >= frames.cx * frames.cy)
+	{
+		currentFrame = 0;
+		playCount++;
+	}
+	if (currentFrame < 0)
+	{
+		currentFrame = frames.cx * frames.cy - 1;
+		playCount++;
+	}
 }
 
 bool Sprite::setFrame(int n)
@@ -94,4 +112,7 @@ void Sprite::reset()
 	frames.SetSize(0, 0);
 	currentFrame = 0;
 	animationDirection = 0;
+	playCount = 0;
+	frameSkipMax = 0;
+	frameSkipCount = 0;
 }

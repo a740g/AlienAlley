@@ -21,18 +21,21 @@ private:
 	CSize size;										// sprite size
 	CSize frames;									// total frames (cx * cy)
 	int currentFrame;								// current sprite frame
+	int frameSkipMax;								// total number of frames to skip while updating
+	int frameSkipCount;								// current frame skip count
 
 public:
 
 	CPoint position;								// position of sprite on 2D plane
 	int animationDirection;							// animation driection (can be -ve or +ve)
+	int playCount;									// number of times our animation has been played
 		
-	Sprite(ALLEGRO_BITMAP* ssBitmap = nullptr, int width = 0, int height = 0);
-	~Sprite();
-	bool setBitmap(ALLEGRO_BITMAP* ssBitmap, int width = 0, int height = 0);
+	Sprite();
+	//Sprite(ALLEGRO_BITMAP* ssBitmap = nullptr, int width = 0, int height = 0, int frameSkip = 0);
+	bool setBitmap(ALLEGRO_BITMAP* ssBitmap, int width = 0, int height = 0, int frameSkip = 0);
 	bool collidesWith(const Sprite& s);
 	void draw(int flags = 0);
-	void nextFrame();
+	void update();
 	bool setFrame(int n);
 	void reset();
 };

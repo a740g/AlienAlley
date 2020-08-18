@@ -24,7 +24,7 @@ private:
 	int maxSpriteHeight;
 
 	// Type of objects
-	enum
+	const enum
 	{
 		STAR = 0,
 		GALAXY_1,
@@ -41,7 +41,7 @@ private:
 	};
 
 	// This matches with the object types above
-	const float OBJECT_SPEED[OBJECT_TYPE_COUNT] = {0.5f, 0.2f, 0.2f, 0.2f, 0.2f, 0.8f, 0.8f, 0.8f, 0.8f, 1.1f, 1.1f};
+	const float OBJECT_SPEED[OBJECT_TYPE_COUNT] = { 0.5f, 0.2f, 0.2f, 0.2f, 0.2f, 0.8f, 0.8f, 0.8f, 0.8f, 1.1f, 1.1f };
 
 	// This will hold the sprite bitmap and information
 	struct ObjectSprite

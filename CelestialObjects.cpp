@@ -111,7 +111,7 @@ CelestialObjects::~CelestialObjects()
 	// Free all the sprites
 	for (int i = 0; i < OBJECT_TYPE_COUNT; i++)
 	{
-		if (objectSprite[i].bitmap != nullptr) al_destroy_bitmap(objectSprite[i].bitmap);
+		al_destroy_bitmap(objectSprite[i].bitmap);
 	}
 
 	// Free the object array
@@ -152,6 +152,7 @@ void CelestialObjects::draw()
 		}
 		else
 		{
+			// scale the object speed: b0 + (b1 - b0) * ((a-a0)/(a1-a0))
 			float l = 0.1f + (0.7f - 0.1f) * ((object[i].speed - 0.4f) / (0.6f - 0.4f));
 			if (object[i].y >= 0 && object[i].y <= bufferHeight) al_draw_pixel(objectX, object[i].y, al_map_rgb_f(l + between(0.0f, 0.3f), l + between(0.0f, 0.3f), l + between(0.0f, 0.3f)));
 		}

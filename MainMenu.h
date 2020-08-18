@@ -23,13 +23,6 @@ private:
 	int bufferWidth;
 	int bufferHeight;
 
-	// Bitmap properties
-	ALLEGRO_BITMAP* bitmap;
-	int bitmapWidth;
-	int bitmapHeight;
-
-	void drawScaledBitmap();
-
 public:
 
 	// Type of objects
@@ -41,7 +34,6 @@ public:
 	};
 
 	MainMenu();
-	~MainMenu();
 	void drawTitleScreen();
 	int userInput();
 	void fadeIn();

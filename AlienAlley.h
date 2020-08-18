@@ -20,6 +20,7 @@
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_native_dialog.h>
+#include "Sprite.h"
 #include "CelestialObjects.h"
 #include "MainMenu.h"
 #include "HUD.h"
