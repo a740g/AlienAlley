@@ -14,6 +14,8 @@
 
 #include "AlienAlley.h"
 
+// This is here it avoid a compiler error
+class Sprite;
 
 class Effects
 {
@@ -46,9 +48,9 @@ private:
 	int bufferWidth;
 
 	// Effects array
-	struct FXSprite
+	struct
 	{
-		Sprite sprite;
+		Sprite* sprite;
 		int type;
 		bool used;
 	} fx[FX_N];

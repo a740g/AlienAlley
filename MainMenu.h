@@ -26,7 +26,7 @@ private:
 public:
 
 	// Type of objects
-	enum UserInput
+	const enum
 	{
 		START_GAME,
 		SHOW_HIGHSCORE,

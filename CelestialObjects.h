@@ -44,7 +44,7 @@ private:
 	const float OBJECT_SPEED[OBJECT_TYPE_COUNT] = { 0.5f, 0.2f, 0.2f, 0.2f, 0.2f, 0.8f, 0.8f, 0.8f, 0.8f, 1.1f, 1.1f };
 
 	// This will hold the sprite bitmap and information
-	struct ObjectSprite
+	struct
 	{
 		ALLEGRO_BITMAP* bitmap;
 		int width;

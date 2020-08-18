@@ -17,7 +17,7 @@ Effects::Effects()
 	// Clear the effects array
 	for (int i = 0; i < FX_N; i++)
 	{
-		fx[i].sprite.reset();
+		fx[i].sprite = new Sprite();
 		fx[i].used = false;
 		fx[i].type = SPARKS;
 	}
@@ -54,6 +54,9 @@ Effects::~Effects()
 		al_destroy_sample(sample[i]);
 		al_destroy_bitmap(spriteSheet[i]);
 	}
+
+	for (int i = 0; i < FX_N; i++)
+		delete fx[i].sprite;
 }
 
 bool Effects::add(unsigned int type, int x, int y)
@@ -71,18 +74,18 @@ bool Effects::add(unsigned int type, int x, int y)
 	if (slot >= FX_N) return false;
 
 	// Pan and play the effects sound
-	al_play_sample(sample[type], 1, (2 * x / (bufferWidth - 1)) - 1, 1, ALLEGRO_PLAYMODE_ONCE, nullptr);
-	
+	al_play_sample(sample[type], 1, (2.0f * (float)x / (float)(bufferWidth - 1)) - 1.0f, 1, ALLEGRO_PLAYMODE_ONCE, nullptr);
+
 	fx[slot].type = type;
 	fx[slot].used = true;
 	// Special handling for spark
 	if (type == SPARKS)
-		fx[slot].sprite.setBitmap(spriteSheet[type], spriteSheetSize[type][0], spriteSheetSize[type][1], 1);	// skip one frame for update
+		fx[slot].sprite->setBitmap(spriteSheet[type], spriteSheetSize[type][0], spriteSheetSize[type][1], 1);	// skip one frame for update
 	else
-		fx[slot].sprite.setBitmap(spriteSheet[type], spriteSheetSize[type][0], spriteSheetSize[type][1]);
+		fx[slot].sprite->setBitmap(spriteSheet[type], spriteSheetSize[type][0], spriteSheetSize[type][1]);
 	// Center the sprite
-	fx[slot].sprite.position.x = x - spriteSheetSize[type][0] / 2;
-	fx[slot].sprite.position.y = y - spriteSheetSize[type][1] / 2;
+	fx[slot].sprite->position.x = x - spriteSheetSize[type][0] / 2;
+	fx[slot].sprite->position.y = y - spriteSheetSize[type][1] / 2;
 
 	return true;
 }
@@ -94,9 +97,9 @@ void Effects::update()
 		if (!fx[i].used)
 			continue;
 
-		fx[i].sprite.update();
+		fx[i].sprite->update();
 
-		if (fx[i].sprite.playCount > 0)
+		if (fx[i].sprite->playCount > 0)
 			fx[i].used = false;
 	}
 }
@@ -108,6 +111,6 @@ void Effects::draw()
 		if (!fx[i].used)
 			continue;
 
-		fx[i].sprite.draw();
+		fx[i].sprite->draw();
 	}
 }

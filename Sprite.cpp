@@ -12,15 +12,10 @@
 
 #include "Sprite.h"
 
-Sprite::Sprite()
+Sprite::Sprite(ALLEGRO_BITMAP* ssBitmap, int width, int height, int frameSkip)
 {
-	reset();
+	setBitmap(ssBitmap, width, height, frameSkip);
 }
-
-//Sprite::Sprite(ALLEGRO_BITMAP* ssBitmap, int width, int height, int frameSkip)
-//{
-//	setBitmap(ssBitmap, width, height, frameSkip);
-//}
 
 bool Sprite::setBitmap(ALLEGRO_BITMAP* ssBitmap, int width, int height, int frameSkip)
 {

@@ -30,8 +30,7 @@ public:
 	int animationDirection;							// animation driection (can be -ve or +ve)
 	int playCount;									// number of times our animation has been played
 		
-	Sprite();
-	//Sprite(ALLEGRO_BITMAP* ssBitmap = nullptr, int width = 0, int height = 0, int frameSkip = 0);
+	Sprite(ALLEGRO_BITMAP* ssBitmap = nullptr, int width = 0, int height = 0, int frameSkip = 0);
 	bool setBitmap(ALLEGRO_BITMAP* ssBitmap, int width = 0, int height = 0, int frameSkip = 0);
 	bool collidesWith(const Sprite& s);
 	void draw(int flags = 0);
