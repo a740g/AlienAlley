@@ -17,8 +17,6 @@
 class Sprite
 {
 private:
-	ALLEGRO_BITMAP* spriteSheet;					// pointer to sprite frame bitmaps
-	CSize size;										// sprite size
 	CSize frames;									// total frames (cx * cy)
 	int currentFrame;								// current sprite frame
 	int frameSkipMax;								// total number of frames to skip while updating
@@ -26,6 +24,8 @@ private:
 
 public:
 
+	ALLEGRO_BITMAP* spriteSheet;					// pointer to sprite frame bitmaps
+	CSize size;										// sprite size
 	CPoint position;								// position of sprite on 2D plane
 	int animationDirection;							// animation driection (can be -ve or +ve)
 	int playCount;									// number of times our animation has been played

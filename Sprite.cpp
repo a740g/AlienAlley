@@ -34,6 +34,8 @@ bool Sprite::setBitmap(ALLEGRO_BITMAP* ssBitmap, int width, int height, int fram
 	}
 	else
 	{
+		if (width <= 0) width = height;
+		if (height <= 0) height = width;
 		size.SetSize(width, height);
 		frames.SetSize(al_get_bitmap_width(spriteSheet) / width, al_get_bitmap_height(spriteSheet) / height);
 		animationDirection = 1;							// forward animation

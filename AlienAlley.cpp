@@ -37,9 +37,6 @@ struct DIM_T
 
 struct SPRITES_T
 {
-	ALLEGRO_BITMAP* ship;
-	DIM_T ship_d;
-
 	ALLEGRO_BITMAP* ship_shot[2];
 	DIM_T ship_shot_d;
 
@@ -62,7 +59,7 @@ struct SHOT_T
 
 struct SHIP_T
 {
-	int x, y;
+	Sprite sprite;
 	int ship_max_x, ship_max_y;
 	int shot_timer;
 	int lives;
@@ -177,10 +174,11 @@ void keyboard_update(ALLEGRO_EVENT* event)
 
 void sprites_init()
 {
-	sprites.ship = al_load_bitmap("dat/gfx/hero.png");
-	InitializeCheck(sprites.ship, "dat/gfx/hero.png");
-	sprites.ship_d.w = al_get_bitmap_width(sprites.ship);
-	sprites.ship_d.h = al_get_bitmap_height(sprites.ship);
+	ALLEGRO_BITMAP* tmp_bmp;
+
+	tmp_bmp = al_load_bitmap("dat/gfx/hero.png");
+	InitializeCheck(tmp_bmp, "dat/gfx/hero.png");
+	ship.sprite.setBitmap(tmp_bmp, al_get_bitmap_height(tmp_bmp), al_get_bitmap_height(tmp_bmp), 2);	// since we have 32x32 bitmaps and the sheet is just 1 row
 
 	sprites.ship_shot[0] = al_load_bitmap("dat/gfx/hero_shot0.png");
 	InitializeCheck(sprites.ship_shot[0], "dat/gfx/hero_shot0.png");
@@ -215,7 +213,7 @@ void sprites_init()
 
 void sprites_deinit()
 {
-	al_destroy_bitmap(sprites.ship);
+	al_destroy_bitmap(ship.sprite.spriteSheet);
 
 	al_destroy_bitmap(sprites.ship_shot[0]);
 	al_destroy_bitmap(sprites.ship_shot[1]);
@@ -422,10 +420,10 @@ void shots_draw()
 
 void ship_init()
 {
-	ship.x = (screen_width / 2) - (sprites.ship_d.w / 2);
-	ship.y = (screen_height / 2) - (sprites.ship_d.h / 2);
-	ship.ship_max_x = screen_width - sprites.ship_d.w;
-	ship.ship_max_y = screen_height - sprites.ship_d.h;
+	ship.sprite.position.x = (screen_width / 2) - (ship.sprite.size.cx / 2);
+	ship.sprite.position.y = (screen_height / 2) - (ship.sprite.size.cy / 2);
+	ship.ship_max_x = screen_width - ship.sprite.size.cx;
+	ship.ship_max_y = screen_height - ship.sprite.size.cy;
 	ship.shot_timer = 0;
 	ship.lives = HUD::LIVES_MAX;
 	ship.shield = HUD::SHIELD_MAX;
@@ -444,34 +442,36 @@ void ship_update()
 		return;
 	}
 
+	ship.sprite.update();
+
 	if (key[ALLEGRO_KEY_LEFT])
-		ship.x -= SHIP_SPEED;
+		ship.sprite.position.x -= SHIP_SPEED;
 	if (key[ALLEGRO_KEY_RIGHT])
-		ship.x += SHIP_SPEED;
+		ship.sprite.position.x += SHIP_SPEED;
 	if (key[ALLEGRO_KEY_UP])
-		ship.y -= SHIP_SPEED;
+		ship.sprite.position.y -= SHIP_SPEED;
 	if (key[ALLEGRO_KEY_DOWN])
-		ship.y += SHIP_SPEED;
+		ship.sprite.position.y += SHIP_SPEED;
 
-	if (ship.x < 0)
-		ship.x = 0;
-	if (ship.y < 0)
-		ship.y = 0;
+	if (ship.sprite.position.x < 0)
+		ship.sprite.position.x = 0;
+	if (ship.sprite.position.y < 0)
+		ship.sprite.position.y = 0;
 
-	if (ship.x > ship.ship_max_x) ship.x = ship.ship_max_x;
-	if (ship.y > ship.ship_max_y) ship.y = ship.ship_max_y;
+	if (ship.sprite.position.x > ship.ship_max_x) ship.sprite.position.x = ship.ship_max_x;
+	if (ship.sprite.position.y > ship.ship_max_y) ship.sprite.position.y = ship.ship_max_y;
 
 	if (ship.invincible_timer)
 		ship.invincible_timer--;
 	else
 	{
-		if (shots_collide(true, ship.x, ship.y, sprites.ship_d.w, sprites.ship_d.h))
+		if (shots_collide(true, ship.sprite.position.x, ship.sprite.position.y, ship.sprite.size.cx, ship.sprite.size.cy))
 		{
 			ship.shield -= 2;
 			if (ship.shield <= 0 && ship.lives > 0)
 			{
-				int x = ship.x + (sprites.ship_d.w / 2);
-				int y = ship.y + (sprites.ship_d.h / 2);
+				int x = ship.sprite.position.x + (ship.sprite.size.cx / 2);
+				int y = ship.sprite.position.y + (ship.sprite.size.cy / 2);
 				FX->add(FX->EXPLOSION_SMALL, x, y);
 
 				ship.lives--;
@@ -488,8 +488,8 @@ void ship_update()
 		ship.shot_timer--;
 	else if (key[ALLEGRO_KEY_LCTRL] || key[ALLEGRO_KEY_SPACE] || key[ALLEGRO_KEY_RCTRL])
 	{
-		int x = ship.x + (sprites.ship_d.w / 2);
-		if (shots_add(true, false, x, ship.y))
+		int x = ship.sprite.position.x + (ship.sprite.size.cx / 2);
+		if (shots_add(true, false, x, ship.sprite.position.y))
 			ship.shot_timer = 5;
 	}
 }
@@ -503,7 +503,7 @@ void ship_draw()
 	if (((ship.invincible_timer / 2) % 3) == 1)
 		return;
 
-	al_draw_bitmap(sprites.ship, ship.x, ship.y, 0);
+	ship.sprite.draw();
 }
 
 // --- aliens ---
