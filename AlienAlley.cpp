@@ -178,7 +178,7 @@ void sprites_init()
 
 	tmp_bmp = al_load_bitmap("dat/gfx/hero.png");
 	InitializeCheck(tmp_bmp, "dat/gfx/hero.png");
-	ship.sprite.setBitmap(tmp_bmp, al_get_bitmap_height(tmp_bmp), al_get_bitmap_height(tmp_bmp), 2);	// since we have 32x32 bitmaps and the sheet is just 1 row
+	ship.sprite.setBitmap(tmp_bmp, al_get_bitmap_height(tmp_bmp), al_get_bitmap_height(tmp_bmp), 3);	// since we have 32x32 bitmaps and the sheet is just 1 row
 
 	sprites.ship_shot[0] = al_load_bitmap("dat/gfx/hero_shot0.png");
 	InitializeCheck(sprites.ship_shot[0], "dat/gfx/hero_shot0.png");
