@@ -15,7 +15,6 @@
 constexpr auto KEY_SEEN = 1;							// Key see and released flags
 constexpr auto KEY_RELEASED = 2;
 constexpr auto SHOTS_N = 128;
-constexpr auto SHIP_SPEED = 3;
 constexpr auto ALIENS_N = 8;
 
 // Types of aliens
@@ -49,25 +48,6 @@ struct SPRITES_T
 	ALLEGRO_BITMAP* powerup;
 };
 
-struct SHOT_T
-{
-	int x, y, dx, dy;
-	int frame;
-	bool ship;
-	bool used;
-};
-
-struct SHIP_T
-{
-	Sprite sprite;
-	int ship_max_x, ship_max_y;
-	int shot_timer;
-	int lives;
-	int shield;
-	int respawn_timer;
-	int invincible_timer;
-};
-
 struct ALIEN_T
 {
 	int x, y;
@@ -78,22 +58,30 @@ struct ALIEN_T
 	bool used;
 };
 
+struct SHOT_T
+{
+	int x, y, dx, dy;
+	int frame;
+	bool ship;
+	bool used;
+};
+
 unsigned char key[ALLEGRO_KEY_MAX];						// Key state array
 ALLEGRO_DISPLAY* disp = nullptr;						// Allegro display
 int screen_width = 640;									// Screen width - this is updated later
 int screen_height = 480;								// Screen height - this is updated later
 long frames;											// How many frame did we render?
-long score;												// What is the player score?
 ALLEGRO_SAMPLE* sample_shot;
 ALLEGRO_AUDIO_STREAM* music;
 SPRITES_T sprites;
 SHOT_T shots[SHOTS_N];
-SHIP_T ship;
 ALIEN_T aliens[ALIENS_N];
+
 MainMenu* mainMenu;
 CelestialObjects* celestialObjects;
 HUD* gameHUD;
 Effects* FX;
+Hero* hero;
 
 
 // Check if a Allegro/pogram initialization succeeded
@@ -174,12 +162,6 @@ void keyboard_update(ALLEGRO_EVENT* event)
 
 void sprites_init()
 {
-	ALLEGRO_BITMAP* tmp_bmp;
-
-	tmp_bmp = al_load_bitmap("dat/gfx/hero.png");
-	InitializeCheck(tmp_bmp, "dat/gfx/hero.png");
-	ship.sprite.setBitmap(tmp_bmp, al_get_bitmap_height(tmp_bmp), al_get_bitmap_height(tmp_bmp), 3);	// since we have 32x32 bitmaps and the sheet is just 1 row
-
 	sprites.ship_shot[0] = al_load_bitmap("dat/gfx/hero_shot0.png");
 	InitializeCheck(sprites.ship_shot[0], "dat/gfx/hero_shot0.png");
 	sprites.ship_shot[1] = al_load_bitmap("dat/gfx/hero_shot1.png");
@@ -213,8 +195,6 @@ void sprites_init()
 
 void sprites_deinit()
 {
-	al_destroy_bitmap(ship.sprite.spriteSheet);
-
 	al_destroy_bitmap(sprites.ship_shot[0]);
 	al_destroy_bitmap(sprites.ship_shot[1]);
 
@@ -414,96 +394,6 @@ void shots_draw()
 			al_draw_tinted_bitmap(sprites.alien_shot, tint, shots[i].x, shots[i].y, 0);
 		}
 	}
-}
-
-// --- ship ---
-
-void ship_init()
-{
-	ship.sprite.position.x = (screen_width / 2) - (ship.sprite.size.cx / 2);
-	ship.sprite.position.y = (screen_height / 2) - (ship.sprite.size.cy / 2);
-	ship.ship_max_x = screen_width - ship.sprite.size.cx;
-	ship.ship_max_y = screen_height - ship.sprite.size.cy;
-	ship.shot_timer = 0;
-	ship.lives = HUD::LIVES_MAX;
-	ship.shield = HUD::SHIELD_MAX;
-	ship.respawn_timer = 0;
-	ship.invincible_timer = 120;
-}
-
-void ship_update()
-{
-	if (ship.lives <= 0)
-		return;
-
-	if (ship.respawn_timer)
-	{
-		ship.respawn_timer--;
-		return;
-	}
-
-	ship.sprite.update();
-
-	if (key[ALLEGRO_KEY_LEFT])
-		ship.sprite.position.x -= SHIP_SPEED;
-	if (key[ALLEGRO_KEY_RIGHT])
-		ship.sprite.position.x += SHIP_SPEED;
-	if (key[ALLEGRO_KEY_UP])
-		ship.sprite.position.y -= SHIP_SPEED;
-	if (key[ALLEGRO_KEY_DOWN])
-		ship.sprite.position.y += SHIP_SPEED;
-
-	if (ship.sprite.position.x < 0)
-		ship.sprite.position.x = 0;
-	if (ship.sprite.position.y < 0)
-		ship.sprite.position.y = 0;
-
-	if (ship.sprite.position.x > ship.ship_max_x) ship.sprite.position.x = ship.ship_max_x;
-	if (ship.sprite.position.y > ship.ship_max_y) ship.sprite.position.y = ship.ship_max_y;
-
-	if (ship.invincible_timer)
-		ship.invincible_timer--;
-	else
-	{
-		if (shots_collide(true, ship.sprite.position.x, ship.sprite.position.y, ship.sprite.size.cx, ship.sprite.size.cy))
-		{
-			ship.shield -= 2;
-			if (ship.shield <= 0 && ship.lives > 0)
-			{
-				int x = ship.sprite.position.x + (ship.sprite.size.cx / 2);
-				int y = ship.sprite.position.y + (ship.sprite.size.cy / 2);
-				FX->add(FX->EXPLOSION_SMALL, x, y);
-
-				ship.lives--;
-				ship.shield = HUD::SHIELD_MAX;
-
-				ship.respawn_timer = 90;
-				ship.invincible_timer = 180;
-			}
-
-		}
-	}
-
-	if (ship.shot_timer)
-		ship.shot_timer--;
-	else if (key[ALLEGRO_KEY_LCTRL] || key[ALLEGRO_KEY_SPACE] || key[ALLEGRO_KEY_RCTRL])
-	{
-		int x = ship.sprite.position.x + (ship.sprite.size.cx / 2);
-		if (shots_add(true, false, x, ship.sprite.position.y))
-			ship.shot_timer = 5;
-	}
-}
-
-void ship_draw()
-{
-	if (ship.lives <= 0)
-		return;
-	if (ship.respawn_timer)
-		return;
-	if (((ship.invincible_timer / 2) % 3) == 1)
-		return;
-
-	ship.sprite.draw();
 }
 
 // --- aliens ---

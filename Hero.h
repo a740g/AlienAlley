@@ -12,21 +12,30 @@
 
 #pragma once
 
-#include <atltypes.h>
-#include <allegro5/allegro5.h>
-#include <allegro5/allegro_native_dialog.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_acodec.h>
-#include <allegro5/allegro_audio.h>
-#include "Sprite.h"
-#include "MainMenu.h"
-#include "HUD.h"
-#include "CelestialObjects.h"
-#include "Effects.h"
-#include "Hero.h"
+#include "AlienAlley.h"
 
-void InitializeCheck(bool test, const char* description);
-int between(int lo, int hi);
-float between(float lo, float hi);
+class Hero
+{
+private:
+	int bufferWidth;					// framebuffer width
+	int bufferHeight;					// framebuffer height
+	int shotTimer;
+	int respawnTimer;
+
+public:
+	const static int SPEED_DEFAULT = 3;
+	const static int INVINCIBLE_TIMER_DEFAULT = 120;
+
+	// Hero sprite
+	Sprite sprite;
+	// Hero speed
+	int speed;
+	// Hero invincibility
+	int invincibleTimer;
+
+	Hero();
+	~Hero();
+	void update(int lives, bool moveLeft, bool moveRight, bool moveUp, bool moveDown, bool shoot);
+	void draw();
+};
+

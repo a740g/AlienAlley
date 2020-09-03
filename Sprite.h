@@ -25,10 +25,11 @@ private:
 public:
 
 	ALLEGRO_BITMAP* spriteSheet;					// pointer to sprite frame bitmaps
-	CSize size;										// sprite size
-	CPoint position;								// position of sprite on 2D plane
+	CSize size;										// sprite *frame* size
+	CPoint position;								// position of sprite on 2D plane. This is the center of the sprite
 	int animationDirection;							// animation driection (can be -ve or +ve)
 	int playCount;									// number of times our animation has been played
+	CRect boundary;									// Sprite boundary
 		
 	Sprite(ALLEGRO_BITMAP* ssBitmap = nullptr, int width = 0, int height = 0, int frameSkip = 0);
 	bool setBitmap(ALLEGRO_BITMAP* ssBitmap, int width = 0, int height = 0, int frameSkip = 0);

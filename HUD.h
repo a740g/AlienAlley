@@ -38,9 +38,6 @@ private:
 	ALLEGRO_BITMAP* lifeBitmap;			// HUD life bitmap
 	int lifeBitmapWidth;				// life bitmap width
 	int lifeBitmapHeight;				// life bitmap height
-	int score;							// game scrore
-	int lives;							// game lives
-	int shield;							// game shield
 	int displayScore;					// score we are going to draw
 	int displayShield;					// shield we are going to draw
 	int bufferWidth;					// framebuffer width
@@ -53,6 +50,10 @@ public:
 	const static int SHIELD_MAX = SHIELD_STATUS_WIDTH;
 	const static int SCORE_MAX = 9999999;						// this should align with DIGITS_MAX
 	const static int LIVES_MAX = 4;
+
+	int score;							// game scrore
+	int lives;							// game lives
+	int shield;							// game shield
 
 	// HUD constructor
 	HUD();

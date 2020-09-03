@@ -57,10 +57,15 @@ HUD::~HUD()
 // Updates all game HUD elements
 void HUD::update(int gameScore, int gameLives, int gameShield)
 {
-    // First we save the game values and also do a sanity check
-    score = (gameScore > SCORE_MAX ? SCORE_MAX : gameScore);
-    lives = (gameLives > LIVES_MAX ? LIVES_MAX : gameLives);
-    shield = (gameShield > SHIELD_MAX ? SHIELD_MAX : gameShield);
+    // Increment the values first
+    score += gameScore;
+    lives += gameLives;
+    shield += gameShield;
+
+    // Now do a sanity check
+    score = min(score, SCORE_MAX);
+    lives = min(lives, LIVES_MAX);
+    shield = min(shield, SHIELD_MAX);
 
     // Now increment or decrement display* unil it reaches the real values
     // First Score

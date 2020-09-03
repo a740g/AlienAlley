@@ -155,6 +155,7 @@
     <ClCompile Include="AlienAlley.cpp" />
     <ClCompile Include="CelestialObjects.cpp" />
     <ClCompile Include="Effects.cpp" />
+    <ClCompile Include="Hero.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Sprite.cpp" />
@@ -169,6 +170,7 @@
     <ClInclude Include="AlienAlley.h" />
     <ClInclude Include="CelestialObjects.h" />
     <ClInclude Include="Effects.h" />
+    <ClInclude Include="Hero.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="resource.h" />

@@ -80,12 +80,12 @@ bool Effects::add(unsigned int type, int x, int y)
 	fx[slot].used = true;
 	// Special handling for spark
 	if (type == SPARKS)
-		fx[slot].sprite->setBitmap(spriteSheet[type], spriteSheetSize[type][0], spriteSheetSize[type][1], 1);	// skip one frame for update
+		fx[slot].sprite->setBitmap(spriteSheet[type], spriteSheetSize[type][0], spriteSheetSize[type][1], 2);	// skip two frames for update
 	else
 		fx[slot].sprite->setBitmap(spriteSheet[type], spriteSheetSize[type][0], spriteSheetSize[type][1]);
 	// Center the sprite
-	fx[slot].sprite->position.x = x - spriteSheetSize[type][0] / 2;
-	fx[slot].sprite->position.y = y - spriteSheetSize[type][1] / 2;
+	fx[slot].sprite->position.x = x - spriteSheetSize[type][0] / 2; // TODO: Centering should be handled by the sprite class
+	fx[slot].sprite->position.y = y - spriteSheetSize[type][1] / 2;	// TODO: Centering should be handled by the sprite class
 
 	return true;
 }

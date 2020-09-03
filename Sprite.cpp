@@ -74,11 +74,18 @@ void Sprite::draw(int flags)
 
 void Sprite::update()
 {
+	// Adjust position to bounding box if we have one
+	if (!boundary.IsRectEmpty())
+	{
+		position.x = min(max(position.x, boundary.left), boundary.right - size.cx);
+		position.y = min(max(position.y, boundary.top), boundary.bottom - size.cy);
+	}
+
 	// Skip frames if user has set frameSkip
 	frameSkipCount++;
 	if (frameSkipCount < frameSkipMax) return;
 
-	// Else, we process the update cycle
+	// Else, we process the rest of the update cycle
 	frameSkipCount = 0;
 	currentFrame += animationDirection;
 
@@ -112,4 +119,5 @@ void Sprite::reset()
 	playCount = 0;
 	frameSkipMax = 0;
 	frameSkipCount = 0;
+	boundary.SetRectEmpty();
 }
