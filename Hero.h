@@ -21,6 +21,7 @@ private:
 	int bufferHeight;					// framebuffer height
 	int shotTimer;
 	int respawnTimer;
+	int lives;
 
 public:
 	const static int SPEED_DEFAULT = 3;

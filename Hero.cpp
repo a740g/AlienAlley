@@ -26,6 +26,7 @@ Hero::Hero()
 	respawnTimer = 0;
 	invincibleTimer = INVINCIBLE_TIMER_DEFAULT;
 	speed = SPEED_DEFAULT;
+	lives = 0;
 	
 	ALLEGRO_BITMAP* tmp_bmp = al_load_bitmap("dat/gfx/hero.png");
 	InitializeCheck(tmp_bmp, "dat/gfx/hero.png");
