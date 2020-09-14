@@ -152,12 +152,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Alien.cpp" />
     <ClCompile Include="AlienAlley.cpp" />
     <ClCompile Include="CelestialObjects.cpp" />
     <ClCompile Include="Effects.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="Hero.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="MainMenu.cpp" />
+    <ClCompile Include="Missiles.cpp" />
     <ClCompile Include="Sprite.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -167,12 +170,15 @@
     <ResourceCompile Include="AlienAlley.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Alien.h" />
     <ClInclude Include="AlienAlley.h" />
     <ClInclude Include="CelestialObjects.h" />
     <ClInclude Include="Effects.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="Hero.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="MainMenu.h" />
+    <ClInclude Include="Missiles.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Sprite.h" />
   </ItemGroup>

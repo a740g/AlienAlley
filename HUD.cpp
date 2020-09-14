@@ -115,7 +115,7 @@ void HUD::draw()
     }
 
     // Finally draw game over message is no lives are left
-    if (lives <= 0)
+    if (lives < 0)
         al_draw_text(font, al_map_rgb_f(1, 1, 1), bufferWidth / 2, bufferHeight / 2, ALLEGRO_ALIGN_CENTER, "G A M E  O V E R");
 }
 
@@ -132,7 +132,7 @@ int HUD::getDigit(int n, int p)
 	case 7: n /= 10000000; break;
 	case 8: n /= 100000000; break;
 	case 9: n /= 1000000000; break;
-	default: InitializeCheck(false, __FUNCTION__": position not handled");
+	default: InitializeCheck(false, __FUNCTION__": case not handled");
 	}
 	return n % 10;
 }

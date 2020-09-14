@@ -21,7 +21,6 @@ private:
 	int bufferHeight;					// framebuffer height
 	int shotTimer;
 	int respawnTimer;
-	int lives;
 
 public:
 	const static int SPEED_DEFAULT = 3;
@@ -29,6 +28,8 @@ public:
 
 	// Hero sprite
 	Sprite sprite;
+	// Hero lives
+	int lives;
 	// Hero speed
 	int speed;
 	// Hero invincibility
@@ -36,7 +37,7 @@ public:
 
 	Hero();
 	~Hero();
-	void update(int lives, bool moveLeft, bool moveRight, bool moveUp, bool moveDown, bool shoot);
+	void update(int gameLives, bool moveLeft, bool moveRight, bool moveUp, bool moveDown, bool shoot);
 	void draw();
 };
 

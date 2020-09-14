@@ -39,10 +39,13 @@ Hero::~Hero()
 	al_destroy_bitmap(sprite.spriteSheet);
 }
 
-void Hero::update(int lives, bool moveLeft, bool moveRight, bool moveUp, bool moveDown, bool shoot)
+void Hero::update(int gameLives, bool moveLeft, bool moveRight, bool moveUp, bool moveDown, bool shoot)
 {
+	
+	lives = gameLives;
+
 	// No need to update if we are out of lives
-	if (lives <= 0)
+	if (lives < 0)
 		return;
 
 	// Hero will come to life after some time
