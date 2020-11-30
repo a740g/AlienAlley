@@ -44,7 +44,7 @@ bool Sprite::setBitmap(ALLEGRO_BITMAP* ssBitmap, int width, int height, int fram
 	currentFrame = 0;
 	frameSkipMax = frameSkip;
 	frameSkipCount = 0;
-	return false;
+	return true;
 }
 
 // Return true if s collides with *this
