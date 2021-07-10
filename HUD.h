@@ -60,7 +60,7 @@ public:
 	// HUD destructor
 	~HUD();
 	// Updates all game HUD elements
-	void update(int gameScore, int gameLives, int gameShield);
+	void update();
 	// Draws the game HUD on the framebuffer
 	void draw();
 };

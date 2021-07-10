@@ -6,7 +6,7 @@
 // /_/   \_\_|_|\___|_| |_| /_/   \_\_|_|\___|\__, |
 //                                            |___/
 //
-//  Conversion/port copyright © Samuel Gomes & Neil Gomes, 1998-2020.
+//  Source port / mod copyright © Samuel Gomes & Neil Gomes
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -25,8 +25,7 @@
 #include "HUD.h"
 #include "CelestialObjects.h"
 #include "Effects.h"
+#include "Missiles.h"
 #include "Hero.h"
-
-void InitializeCheck(bool test, const char* description);
-int between(int lo, int hi);
-float between(float lo, float hi);
+#include "Aliens.h"
+#include "Game.h"

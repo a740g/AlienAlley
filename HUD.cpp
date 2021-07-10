@@ -27,21 +27,21 @@ HUD::HUD()
 
     // Load the game font
     font = al_create_builtin_font();
-    InitializeCheck(font, "font");
+    Game::checkInitialized(font, "font");
 
     // Load game assets
     digitSpriteSheet = al_load_bitmap("dat/gfx/digits_ss.png");
-    InitializeCheck(digitSpriteSheet, "dat/gfx/digits_ss.png");
+    Game::checkInitialized(digitSpriteSheet, "dat/gfx/digits_ss.png");
     digitSpriteWidth = al_get_bitmap_width(digitSpriteSheet) / 10;          // for 10 digits
     digitSpriteHeight = al_get_bitmap_height(digitSpriteSheet);
 
     HUDBitmap = al_load_bitmap("dat/gfx/hud.png");
-    InitializeCheck(HUDBitmap, "dat/gfx/hud.png");
+    Game::checkInitialized(HUDBitmap, "dat/gfx/hud.png");
     HUDStartX = bufferWidth / 2 - al_get_bitmap_width(HUDBitmap) / 2;       // center horizontally
     HUDStartY = bufferHeight - al_get_bitmap_height(HUDBitmap);             // align to the bottom
 
     lifeBitmap = al_load_bitmap("dat/gfx/life.png");
-    InitializeCheck(lifeBitmap, "dat/gfx/life.png");
+    Game::checkInitialized(lifeBitmap, "dat/gfx/life.png");
     lifeBitmapWidth = al_get_bitmap_width(lifeBitmap);
     lifeBitmapHeight = al_get_bitmap_height(lifeBitmap);
 }
@@ -55,14 +55,14 @@ HUD::~HUD()
 }
 
 // Updates all game HUD elements
-void HUD::update(int gameScore, int gameLives, int gameShield)
+void HUD::update()
 {
     // Increment the values first
-    score += gameScore;
-    lives += gameLives;
-    shield += gameShield;
+    //score += gameScore;
+    //lives += gameLives;
+    //shield += gameShield;
 
-    // Now do a sanity check
+    // Do a sanity check
     score = min(score, SCORE_MAX);
     lives = min(lives, LIVES_MAX);
     shield = min(shield, SHIELD_MAX);
@@ -121,18 +121,40 @@ void HUD::draw()
 
 int HUD::getDigit(int n, int p)
 {
-	switch (p) {
-    case 0: break;
-	case 1: n /= 10; break;
-	case 2: n /= 100; break;
-	case 3: n /= 1000; break;
-	case 4: n /= 10000; break;
-	case 5: n /= 100000; break;
-	case 6: n /= 1000000; break;
-	case 7: n /= 10000000; break;
-	case 8: n /= 100000000; break;
-	case 9: n /= 1000000000; break;
-	default: InitializeCheck(false, __FUNCTION__": case not handled");
+	switch (p)
+    {
+    case 0:
+        break;
+	case 1:
+        n /= 10;
+        break;
+	case 2:
+        n /= 100;
+        break;
+	case 3:
+        n /= 1000;
+        break;
+	case 4:
+        n /= 10000;
+        break;
+	case 5:
+        n /= 100000;
+        break;
+	case 6:
+        n /= 1000000;
+        break;
+	case 7:
+        n /= 10000000;
+        break;
+	case 8:
+        n /= 100000000;
+        break;
+	case 9:
+        n /= 1000000000;
+        break;
+	default:
+        Game::checkInitialized(false, __FUNCTION__": case not handled");
 	}
-	return n % 10;
+	
+    return n % 10;
 }

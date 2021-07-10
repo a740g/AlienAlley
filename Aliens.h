@@ -14,46 +14,53 @@
 
 #include "AlienAlley.h"
 
-class Missiles
+class Aliens
 {
 public:
-	// Type of missiles
+	// Types of aliens
 	const enum
 	{
-		HERO = 0,
-		ALIEN,
-		MISSILES_TYPE_COUNT
+		BUG = 0,
+		ARROW,
+		VIPER,
+		GIM72,
+		HOMER,
+		BOP,
+		EMAGO,
+		XTC,
+		THICCBOI,
+		ALIEN_TYPE_COUNT
 	};
 
-	Missiles();
-	~Missiles();
-	// Update all missile locations, sprites etc.
-	void update();
-	// Draw all missiles
+	Aliens();
+	~Aliens();
+	// Run alien AI, update location & sprites
+	void update(unsigned long frameCounter, Missiles& mm, Effects& fm, HUD& hm);
+	// Draw alien
 	void draw();
-	// Add a missile from an object on the screen
-	bool add(unsigned int type, bool straight, int x, int y);
 
 private:
-	const static int SHOTS_N = 256;
+	const static int ALIENS_N = 8;				// maximum simultaneous aliens on the screen
 
 	// Sprite sizes in spritesheets
-	const int spriteSheetSize[MISSILES_TYPE_COUNT][2] = { {4, 18}, {5, 5} };
-	 
-	int bufferWidth;		// Screen width for audio panning & clipping sprites
+	const int spriteSheetSize[ALIEN_TYPE_COUNT][2] = { {30, 17}, {32, 32}, {32, 32}, {64, 64}, {64, 64}, {64, 64}, {64, 64}, {64, 64}, {80, 75} };
+
+	int bufferWidth;		// For clipping sprites
 	int bufferHeight;		// For clipping sprites
 
-	// Missiles array
+	// Aliens array
 	struct
 	{
 		Sprite* sprite;
-		int dx, dy;
 		int type;
+		int shotTimer;
+		int blinkTimer;
+		int directionTimer;
+		int dx;
+		int life;
 		bool used;
-	} shot[SHOTS_N];
+	} alien[ALIENS_N];
 
 	// Effects sprite sheets
-	ALLEGRO_BITMAP* spriteSheet[MISSILES_TYPE_COUNT];
-	// Missile sounds
-	ALLEGRO_SAMPLE* sample[MISSILES_TYPE_COUNT];
+	ALLEGRO_BITMAP* spriteSheet[ALIEN_TYPE_COUNT];
 };

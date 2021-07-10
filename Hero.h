@@ -17,27 +17,24 @@
 class Hero
 {
 private:
-	int bufferWidth;					// framebuffer width
-	int bufferHeight;					// framebuffer height
-	int shotTimer;
-	int respawnTimer;
-
-public:
 	const static int SPEED_DEFAULT = 3;
 	const static int INVINCIBLE_TIMER_DEFAULT = 120;
 
+	int bufferWidth;					// framebuffer width
+	int bufferHeight;					// framebuffer height
+	int shotTimer;						// can we shoot?
+	int respawnTimer;					// can we respawn?
+	int invincibleTimer;				// hero invincibility
+	int lives;							// this should be sync'ed from the HUD
+	int speed;							// hero speed
+
+public:
 	// Hero sprite
 	Sprite sprite;
-	// Hero lives
-	int lives;
-	// Hero speed
-	int speed;
-	// Hero invincibility
-	int invincibleTimer;
 
 	Hero();
 	~Hero();
-	void update(int gameLives, bool moveLeft, bool moveRight, bool moveUp, bool moveDown, bool shoot);
+	// Update hero location, add missiles and effects based on input
+	void update(int gameLives, bool moveLeft, bool moveRight, bool moveUp, bool moveDown, bool shoot, Missiles& mm, Effects& fm);
 	void draw();
 };
-

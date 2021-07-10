@@ -39,7 +39,7 @@ public:
 private:
 
 	// Maximum number of simultaneous effects
-	const static int FX_N = 128;
+	const static int FX_N = 256;
 
 	// Sprite sizes in spritesheets
 	const int spriteSheetSize[EFFECTS_TYPE_COUNT][2] = { {20, 20}, {32, 32}, {64, 64}, {80, 80} };

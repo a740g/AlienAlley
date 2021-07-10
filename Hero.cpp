@@ -29,7 +29,8 @@ Hero::Hero()
 	lives = 0;
 	
 	ALLEGRO_BITMAP* tmp_bmp = al_load_bitmap("dat/gfx/hero.png");
-	InitializeCheck(tmp_bmp, "dat/gfx/hero.png");
+	Game::checkInitialized(tmp_bmp, "dat/gfx/hero.png");
+
 	// Since we have 32x32 bitmaps and the sheet is just 1 row
 	sprite.setBitmap(tmp_bmp, al_get_bitmap_height(tmp_bmp), al_get_bitmap_height(tmp_bmp), 3);
 }
@@ -39,9 +40,18 @@ Hero::~Hero()
 	al_destroy_bitmap(sprite.spriteSheet);
 }
 
-void Hero::update(int gameLives, bool moveLeft, bool moveRight, bool moveUp, bool moveDown, bool shoot)
+// Update hero location, add missiles and effects based on input
+void Hero::update(int gameLives, bool moveLeft, bool moveRight, bool moveUp, bool moveDown, bool shoot, Missiles& mm, Effects& fm)
 {
-	
+	// Queue in the final explosion if this is the last life
+	if (gameLives < 0 && lives != gameLives)
+	{
+		int cx = sprite.position.x + (sprite.size.cx / 2);
+		int cy = sprite.position.y + (sprite.size.cy / 2);
+
+		fm.add(fm.EXPLOSION_BIG, cx, cy);
+	}
+
 	lives = gameLives;
 
 	// No need to update if we are out of lives
@@ -68,47 +78,27 @@ void Hero::update(int gameLives, bool moveLeft, bool moveRight, bool moveUp, boo
 	// Make the sprite logic go
 	sprite.update();
 
-	if (invincibleTimer)
-		invincibleTimer--;
-	else
+	// NOTE: Moved collision dectection to Game class
+
+	// Check if we can shoot and shoot if we have correct user input
+	if (shotTimer)
+		shotTimer--;
+	else if (shoot)
 	{
-		if (shots_collide(true, ship.sprite.position.x, ship.sprite.position.y, ship.sprite.size.cx, ship.sprite.size.cy))
-		{
-			ship.shield -= 2;
-			if (ship.shield <= 0 && ship.lives > 0)
-			{
-				int x = ship.sprite.position.x + (ship.sprite.size.cx / 2);
-				int y = ship.sprite.position.y + (ship.sprite.size.cy / 2);
-				FX->add(FX->EXPLOSION_SMALL, x, y);
-
-				ship.lives--;
-				ship.shield = HUD::SHIELD_MAX;
-
-				ship.respawn_timer = 90;
-				ship.invincible_timer = 180;
-			}
-
-		}
-	}
-
-	if (ship.shot_timer)
-		ship.shot_timer--;
-	else if (key[ALLEGRO_KEY_LCTRL] || key[ALLEGRO_KEY_SPACE] || key[ALLEGRO_KEY_RCTRL])
-	{
-		int x = ship.sprite.position.x + (ship.sprite.size.cx / 2);
-		if (shots_add(true, false, x, ship.sprite.position.y))
-			ship.shot_timer = 5;
+		int x = sprite.position.x + (sprite.size.cx / 2);
+		if (mm.add(mm.HERO, true, x, sprite.position.y))
+			shotTimer = 5;
 	}
 }
 
 void Hero::draw()
 {
-	if (ship.lives <= 0)
+	if (lives <= 0)
 		return;
-	if (ship.respawn_timer)
+	if (respawnTimer)
 		return;
-	if (((ship.invincible_timer / 2) % 3) == 1)
+	if (((invincibleTimer / 2) % 3) == 1)
 		return;
 
-	ship.sprite.draw();
+	sprite.draw();
 }

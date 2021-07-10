@@ -26,7 +26,7 @@ void MainMenu::drawTitleScreen()
 	al_clear_to_color(al_map_rgb(0, 0, 0));
 
 	ALLEGRO_BITMAP* bitmap = al_load_bitmap("dat/gfx/title_screen.png");
-	InitializeCheck(bitmap, "dat/gfx/title_screen.png");
+	Game::checkInitialized(bitmap, "dat/gfx/title_screen.png");
 	int bitmapWidth = al_get_bitmap_width(bitmap);
 	int bitmapHeight = al_get_bitmap_height(bitmap);
 
@@ -56,7 +56,7 @@ int MainMenu::userInput()
 void MainMenu::fadeIn()
 {
 	ALLEGRO_BITMAP* tempBitmap = al_clone_bitmap(al_get_backbuffer(display));
-	InitializeCheck(tempBitmap, __FUNCTION__": failed to get video memory bitmap");
+	Game::checkInitialized(tempBitmap, __FUNCTION__": failed to get video memory bitmap");
 
 	for (int a = 0; a < 256; a++)
 	{
@@ -72,7 +72,7 @@ void MainMenu::fadeIn()
 void MainMenu::fadeOut()
 {
 	ALLEGRO_BITMAP* tempBitmap = al_clone_bitmap(al_get_backbuffer(display));
-	InitializeCheck(tempBitmap, __FUNCTION__": failed to get video memory bitmap");
+	Game::checkInitialized(tempBitmap, __FUNCTION__": failed to get video memory bitmap");
 
 	for (int a = 0; a < 256; a++)
 	{

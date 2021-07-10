@@ -42,7 +42,7 @@
     <ClCompile Include="Missiles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Alien.cpp">
+    <ClCompile Include="Aliens.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -87,7 +87,7 @@
     <ClInclude Include="Missiles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Alien.h">
+    <ClInclude Include="Aliens.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
