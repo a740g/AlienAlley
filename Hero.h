@@ -23,6 +23,7 @@ private:
 	const static int SPEED_DEFAULT = 3;
 	const static int INVINCIBLE_TIMER_DEFAULT = 180;
 	const static int RESPAWN_TIMER_DEFAULT = 90;
+	const static int SHOT_TIMER_DEFAULT = 20;
 
 	int bufferWidth;					// framebuffer width
 	int bufferHeight;					// framebuffer height

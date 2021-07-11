@@ -22,28 +22,25 @@ HUD::HUD()
     displayShield = SHIELD_MAX;
 
     // Initialize the buffer width and height
-    bufferWidth = al_get_display_width(al_get_current_display());
-    bufferHeight = al_get_display_height(al_get_current_display());
+    bufferSize.SetSize(al_get_display_width(al_get_current_display()), al_get_display_height(al_get_current_display()));
 
     // Load the game font
     font = al_create_builtin_font();
-    Game::checkInitialized(font, "font");
+    Game::checkInitialized(font, __FUNCTION__": failed to initialize Allegro font");
 
     // Load game assets
     digitSpriteSheet = al_load_bitmap("dat/gfx/digits_ss.png");
-    Game::checkInitialized(digitSpriteSheet, "dat/gfx/digits_ss.png");
-    digitSpriteWidth = al_get_bitmap_width(digitSpriteSheet) / 10;          // for 10 digits
-    digitSpriteHeight = al_get_bitmap_height(digitSpriteSheet);
+    Game::checkInitialized(digitSpriteSheet, __FUNCTION__": failed to load dat/gfx/digits_ss.png");
+    digitSpriteSize.SetSize(al_get_bitmap_width(digitSpriteSheet) / 10, al_get_bitmap_height(digitSpriteSheet));          // for 10 digits
 
     HUDBitmap = al_load_bitmap("dat/gfx/hud.png");
-    Game::checkInitialized(HUDBitmap, "dat/gfx/hud.png");
+    Game::checkInitialized(HUDBitmap, __FUNCTION__": failed to load dat/gfx/hud.png");
     // Center & align to the bottom
-    HUDStartPosition.SetPoint(bufferWidth / 2 - al_get_bitmap_width(HUDBitmap) / 2, bufferHeight - al_get_bitmap_height(HUDBitmap));
+    HUDStartPosition.SetPoint(bufferSize.cx / 2 - al_get_bitmap_width(HUDBitmap) / 2, bufferSize.cy - al_get_bitmap_height(HUDBitmap));
 
     lifeBitmap = al_load_bitmap("dat/gfx/life.png");
-    Game::checkInitialized(lifeBitmap, "dat/gfx/life.png");
-    lifeBitmapWidth = al_get_bitmap_width(lifeBitmap);
-    lifeBitmapHeight = al_get_bitmap_height(lifeBitmap);
+    Game::checkInitialized(lifeBitmap, __FUNCTION__": failed to load dat/gfx/life.png");
+    lifeBitmapSize.SetSize(al_get_bitmap_width(lifeBitmap), al_get_bitmap_height(lifeBitmap));
 }
 
 HUD::~HUD()
@@ -100,23 +97,23 @@ void HUD::draw()
     al_draw_filled_rectangle(SHIELD_STATUS_LEFT + HUDStartPosition.x, SHIELD_STATUS_TOP + HUDStartPosition.y, SHIELD_STATUS_LEFT + HUDStartPosition.x + displayShield, SHIELD_STATUS_BOTTOM + HUDStartPosition.y, al_map_rgb_f(1, (float)displayShield / (float)SHIELD_MAX, (float)lives / (float)LIVES_MAX));
 
     // Now draw the lives
-    spacing = lifeBitmapWidth + 2;
+    spacing = lifeBitmapSize.cx + 2;
     for (i = 0; i < lives; i++)
         al_draw_bitmap(lifeBitmap, 2 + SHIELD_STATUS_LEFT + HUDStartPosition.x + i * spacing, 2 + SHIELD_STATUS_TOP + HUDStartPosition.y, 0);
 
     // Now draw the score
-    spacing = digitSpriteWidth;
+    spacing = digitSpriteSize.cx;
     j = 0;
     for (i = DIGITS_MAX - 1; i >= 0 ; i--)
     {
         digit = getDigit(displayScore, i);
-        al_draw_bitmap_region(digitSpriteSheet, digit * digitSpriteWidth, 0, digitSpriteWidth, digitSpriteHeight, SCORE_NUMBERS_LEFT + HUDStartPosition.x + j * digitSpriteWidth, SCORE_NUMBERS_TOP + HUDStartPosition.y, 0);
+        al_draw_bitmap_region(digitSpriteSheet, digit * digitSpriteSize.cx, 0, digitSpriteSize.cx, digitSpriteSize.cy, SCORE_NUMBERS_LEFT + HUDStartPosition.x + j * digitSpriteSize.cx, SCORE_NUMBERS_TOP + HUDStartPosition.y, 0);
         j++;
     }
 
     // Finally draw game over message is no lives are left
     if (lives < 0)
-        al_draw_text(font, al_map_rgb_f(1, 1, 1), bufferWidth / 2, bufferHeight / 2, ALLEGRO_ALIGN_CENTER, "G A M E  O V E R");
+        al_draw_text(font, al_map_rgb_f(1, 1, 1), bufferSize.cx / 2, bufferSize.cy / 2, ALLEGRO_ALIGN_CENTER, "G A M E  O V E R");
 }
 
 int HUD::getDigit(int n, int p)

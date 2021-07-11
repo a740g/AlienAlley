@@ -30,16 +30,13 @@ private:
 
 	ALLEGRO_FONT* font;																			// for drawing game over message
 	ALLEGRO_BITMAP* digitSpriteSheet;															// digits bitmap for drawing score
-	int digitSpriteWidth;																		// width of each digit
-	int digitSpriteHeight;																		// height of each digit
+	CSize digitSpriteSize;																		// width & height of each digit
 	ALLEGRO_BITMAP* HUDBitmap;																	// bitmap for the HUD panel
 	ALLEGRO_BITMAP* lifeBitmap;																	// HUD life bitmap
-	int lifeBitmapWidth;																		// life bitmap width
-	int lifeBitmapHeight;																		// life bitmap height
+	CSize lifeBitmapSize;																		// life bitmap width & height
 	int displayScore;																			// score we are going to draw
 	int displayShield;																			// shield we are going to draw
-	int bufferWidth;																			// framebuffer width
-	int bufferHeight;																			// framebuffer height
+	CSize bufferSize;																			// framebuffer width & height
 
 	static int getDigit(int n, int p);
 

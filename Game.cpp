@@ -41,7 +41,7 @@ Game::Game()
 	queue = al_create_event_queue();
 	Game::checkInitialized(queue, __FUNCTION__": failed to create Allgro event queue");
 	font = al_create_builtin_font();
-	Game::checkInitialized(font, "font");
+	Game::checkInitialized(font, __FUNCTION__": failed to load Allegro font");
 
 	Game::checkInitialized(al_init_image_addon(), __FUNCTION__": failed to initialize Allegro image addon");
 	Game::checkInitialized(al_init_primitives_addon(), __FUNCTION__": failed to initialize Allegro primitives addon");
@@ -55,7 +55,7 @@ Game::Game()
 
 	// Streaming music playback. TODO: This should be moved out of here
 	music = al_load_audio_stream("dat/snd/mus/alien_main.opus", 2, 2048);
-	Game::checkInitialized(music, "dat/snd/mus/alien_main.opus");
+	Game::checkInitialized(music, __FUNCTION__": failed to load dat/snd/mus/alien_main.opus");
 	al_set_audio_stream_playmode(music, ALLEGRO_PLAYMODE_LOOP);
 	al_attach_audio_stream_to_mixer(music, al_get_default_mixer());
 
@@ -110,7 +110,7 @@ void Game::checkInitialized(bool test, const char* description)
 {
 	if (test) return;
 
-	al_show_native_message_box(al_get_current_display(), "Error", "Failed to initialize:", description, nullptr, ALLEGRO_MESSAGEBOX_ERROR);
+	al_show_native_message_box(al_get_current_display(), "Error", "Message:", description, nullptr, ALLEGRO_MESSAGEBOX_ERROR);
 
 	exit(EXIT_FAILURE);
 }

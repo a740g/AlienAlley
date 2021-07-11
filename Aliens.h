@@ -36,7 +36,7 @@ public:
 		ALIEN_TYPE_COUNT
 	};
 
-	const static int ALIENS_N = 12;				// maximum simultaneous aliens on the screen
+	const static int ALIENS_N = 8;				// maximum simultaneous aliens on the screen
 
 	// Aliens array
 	struct
@@ -64,8 +64,7 @@ private:
 	// Sprite sizes in spritesheets
 	const int spriteSheetSize[ALIEN_TYPE_COUNT][2] = { {30, 17}, {32, 32}, {32, 32}, {64, 64}, {64, 64}, {64, 64}, {64, 64}, {64, 64}, {80, 75} };
 
-	int bufferWidth;		// For clipping sprites
-	int bufferHeight;		// For clipping sprites
+	CSize bufferSize;							// framebuffer size
 
 	// Effects sprite sheets
 	ALLEGRO_BITMAP* spriteSheet[ALIEN_TYPE_COUNT];

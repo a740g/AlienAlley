@@ -27,23 +27,23 @@ Effects::Effects()
 
 	// Load the effects sprite sheets
 	spriteSheet[SPARKS] = al_load_bitmap("dat/gfx/sparks_ss.png");
-	Game::checkInitialized(spriteSheet[SPARKS], "dat/gfx/sparks_ss.png");
+	Game::checkInitialized(spriteSheet[SPARKS], __FUNCTION__": failed to load dat/gfx/sparks_ss.png");
 	spriteSheet[EXPLOSION_TINY] = al_load_bitmap("dat/gfx/explosion_tiny_ss.png");
-	Game::checkInitialized(spriteSheet[EXPLOSION_TINY], "dat/gfx/explosion_tiny_ss.png");
+	Game::checkInitialized(spriteSheet[EXPLOSION_TINY], __FUNCTION__": failed to load dat/gfx/explosion_tiny_ss.png");
 	spriteSheet[EXPLOSION_SMALL] = al_load_bitmap("dat/gfx/explosion_small_ss.png");
-	Game::checkInitialized(spriteSheet[EXPLOSION_SMALL], "dat/gfx/explosion_small_ss.png");
+	Game::checkInitialized(spriteSheet[EXPLOSION_SMALL], __FUNCTION__": failed to load dat/gfx/explosion_small_ss.png");
 	spriteSheet[EXPLOSION_BIG] = al_load_bitmap("dat/gfx/explosion_big_ss.png");
-	Game::checkInitialized(spriteSheet[EXPLOSION_BIG], "dat/gfx/explosion_big_ss.png");
+	Game::checkInitialized(spriteSheet[EXPLOSION_BIG], __FUNCTION__": failed to load dat/gfx/explosion_big_ss.png");
 
 	// Load audio effects
 	sample[SPARKS] = al_load_sample("dat/snd/sfx/hit.flac");
-	Game::checkInitialized(sample[SPARKS], "dat/snd/sfx/hit.flac");
+	Game::checkInitialized(sample[SPARKS], __FUNCTION__": failed to load dat/snd/sfx/hit.flac");
 	sample[EXPLOSION_TINY] = al_load_sample("dat/snd/sfx/explosion_tiny.flac");
-	Game::checkInitialized(sample[EXPLOSION_TINY], "dat/snd/sfx/explosion_tiny.flac");
+	Game::checkInitialized(sample[EXPLOSION_TINY], __FUNCTION__": failed to load dat/snd/sfx/explosion_tiny.flac");
 	sample[EXPLOSION_SMALL] = al_load_sample("dat/snd/sfx/explosion_small.flac");
-	Game::checkInitialized(sample[EXPLOSION_SMALL], "dat/snd/sfx/explosion_small.flac");
+	Game::checkInitialized(sample[EXPLOSION_SMALL], __FUNCTION__": failed to load dat/snd/sfx/explosion_small.flac");
 	sample[EXPLOSION_BIG] = al_load_sample("dat/snd/sfx/explosion_big.flac");
-	Game::checkInitialized(sample[EXPLOSION_BIG], "dat/snd/sfx/explosion_big.flac");
+	Game::checkInitialized(sample[EXPLOSION_BIG], __FUNCTION__": failed to load dat/snd/sfx/explosion_big.flac");
 }
 
 Effects::~Effects()
@@ -80,7 +80,7 @@ bool Effects::add(unsigned int type, int x, int y)
 	fx[slot].used = true;
 	// Special handling for spark
 	if (type == SPARKS)
-		fx[slot].sprite->setBitmap(spriteSheet[type], spriteSheetSize[type][0], spriteSheetSize[type][1], 2);	// skip two frames for update
+		fx[slot].sprite->setBitmap(spriteSheet[type], spriteSheetSize[type][0], spriteSheetSize[type][1], 5);	// skip two frames for update
 	else
 		fx[slot].sprite->setBitmap(spriteSheet[type], spriteSheetSize[type][0], spriteSheetSize[type][1]);
 	// Center the sprite

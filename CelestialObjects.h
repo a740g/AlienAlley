@@ -19,8 +19,7 @@ class CelestialObjects
 private:
 
 	int objectCount;				// total number of objects on the screen
-	int bufferWidth;
-	int bufferHeight;
+	CSize bufferSize;
 	int maxSpriteHeight;
 
 	// Type of objects
@@ -47,8 +46,7 @@ private:
 	struct
 	{
 		ALLEGRO_BITMAP* bitmap;
-		int width;
-		int height;
+		CSize size;
 	} objectSprite[OBJECT_TYPE_COUNT];
 
 	// This will hold information of the celestial object
@@ -57,7 +55,6 @@ private:
 		float y;
 		float speed;
 		int objectType;
-
 	}* object;
 
 public:

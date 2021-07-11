@@ -29,15 +29,15 @@ Missiles::Missiles()
 
 	// Load the missile sprite sheets
 	spriteSheet[HERO] = al_load_bitmap("dat/gfx/missile_hero_ss.png");
-	Game::checkInitialized(spriteSheet[HERO], "dat/gfx/missile_hero_ss.png");
+	Game::checkInitialized(spriteSheet[HERO], __FUNCTION__": failed to load dat/gfx/missile_hero_ss.png");
 	spriteSheet[ALIEN] = al_load_bitmap("dat/gfx/missile_alien_ss.png");
-	Game::checkInitialized(spriteSheet[ALIEN], "dat/gfx/missile_alien_ss.png");
+	Game::checkInitialized(spriteSheet[ALIEN], __FUNCTION__": failed to load dat/gfx/missile_alien_ss.png");
 
 	// Load audio effects
 	sample[HERO] = al_load_sample("dat/snd/sfx/missile_hero.flac");
-	Game::checkInitialized(sample[HERO], "dat/snd/sfx/missile_hero.flac");
+	Game::checkInitialized(sample[HERO], __FUNCTION__": failed to load dat/snd/sfx/missile_hero.flac");
 	sample[ALIEN] = al_load_sample("dat/snd/sfx/missile_alien.flac");
-	Game::checkInitialized(sample[ALIEN], "dat/snd/sfx/missile_alien.flac");
+	Game::checkInitialized(sample[ALIEN], __FUNCTION__": failed to load dat/snd/sfx/missile_alien.flac");
 }
 
 Missiles::~Missiles()
@@ -102,9 +102,13 @@ void Missiles::hit(int n, Effects& fm)
 {
 	// Sanity checks
 	if (n < 0 || n >= SHOTS_N)
+	{
 		Game::checkInitialized(false, __FUNCTION__": Missile index out of range");
+		return;
+	}
+
 	if (!shot[n].used)
-		Game::checkInitialized(false, __FUNCTION__": Tried to used an inactive missile slot");
+		return;
 
 	// Queue sparks if the missile hit something
 	fm.add(fm.SPARKS, shot[n].sprite->position.x + (shot[n].sprite->size.cx / 2), shot[n].sprite->position.y + (shot[n].sprite->size.cy / 2));

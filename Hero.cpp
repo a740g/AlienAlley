@@ -28,7 +28,7 @@ Hero::Hero(HUD& hm)
 	
 	// Since we are not going to change the hero sprite, we will use the spritesheet member of the sprite class to keep track of the sprite memory
 	ALLEGRO_BITMAP* tmp_bmp = al_load_bitmap("dat/gfx/hero_ss.png");
-	Game::checkInitialized(tmp_bmp, "dat/gfx/hero_ss.png");
+	Game::checkInitialized(tmp_bmp, __FUNCTION__": failed to load dat/gfx/hero_ss.png");
 
 	// Since we have 64x64 bitmap spritesheet and the sheet is just 1 row
 	sprite->setBitmap(tmp_bmp, al_get_bitmap_height(tmp_bmp), al_get_bitmap_height(tmp_bmp), 3);
@@ -36,7 +36,7 @@ Hero::Hero(HUD& hm)
 	// Set sprite position and clipping
 	sprite->position.x = (bufferWidth / 2) - (sprite->size.cx / 2);
 	sprite->position.y = (bufferHeight / 2) - (sprite->size.cy / 2);
-	sprite->boundary.SetRect(0, 0, bufferWidth, hm.HUDStartPosition.y - 1);
+	sprite->boundary.SetRect(0, 0, bufferWidth - 1, hm.HUDStartPosition.y - 1);
 }
 
 Hero::~Hero()
@@ -82,8 +82,8 @@ void Hero::update(bool moveLeft, bool moveRight, bool moveUp, bool moveDown, boo
 	else if (shoot)
 	{
 		int x = sprite->position.x + (sprite->size.cx / 2);
-		if (mm.add(mm.HERO, true, x, sprite->position.y))
-			shotTimer = 5;
+		if (mm.add(mm.HERO, true, x - 24, sprite->position.y + 21) && mm.add(mm.HERO, true, x + 24, sprite->position.y + 21))
+			shotTimer = SHOT_TIMER_DEFAULT;
 	}
 }
 

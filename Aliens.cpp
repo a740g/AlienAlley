@@ -22,36 +22,35 @@ Aliens::Aliens()
 	}
 
 	// Initialize the buffer width and height
-	bufferWidth = al_get_display_width(al_get_current_display());
-	bufferHeight = al_get_display_height(al_get_current_display());
+	bufferSize.SetSize(al_get_display_width(al_get_current_display()), al_get_display_height(al_get_current_display()));
 
 	// Load the missile sprite sheets
-	spriteSheet[BUG] = al_load_bitmap("dat/gfx/alien_bug.png");
-	Game::checkInitialized(spriteSheet[BUG], "dat/gfx/alien_bug.png");
+	spriteSheet[BUG] = al_load_bitmap("dat/gfx/alien_bug_ss.png");
+	Game::checkInitialized(spriteSheet[BUG], __FUNCTION__": failed to load dat/gfx/alien_bug_ss.png");
 
-	spriteSheet[ARROW] = al_load_bitmap("dat/gfx/alien_arrow.png");
-	Game::checkInitialized(spriteSheet[ARROW], "dat/gfx/alien_arrow.png");
+	spriteSheet[ARROW] = al_load_bitmap("dat/gfx/alien_arrow_ss.png");
+	Game::checkInitialized(spriteSheet[ARROW], __FUNCTION__": failed to load dat/gfx/alien_arrow_ss.png");
 
-	spriteSheet[VIPER] = al_load_bitmap("dat/gfx/alien_viper.png");
-	Game::checkInitialized(spriteSheet[VIPER], "dat/gfx/alien_viper.png");
+	spriteSheet[VIPER] = al_load_bitmap("dat/gfx/alien_viper_ss.png");
+	Game::checkInitialized(spriteSheet[VIPER], __FUNCTION__": failed to load dat/gfx/alien_viper_ss.png");
 
-	spriteSheet[GIM72] = al_load_bitmap("dat/gfx/alien_gim72.png");
-	Game::checkInitialized(spriteSheet[GIM72], "dat/gfx/alien_gim72.png");
+	spriteSheet[GIM72] = al_load_bitmap("dat/gfx/alien_gim72_ss.png");
+	Game::checkInitialized(spriteSheet[GIM72], __FUNCTION__": failed to load dat/gfx/alien_gim72_ss.png");
 
-	spriteSheet[HOMER] = al_load_bitmap("dat/gfx/alien_homer.png");
-	Game::checkInitialized(spriteSheet[HOMER], "dat/gfx/alien_homer.png");
+	spriteSheet[HOMER] = al_load_bitmap("dat/gfx/alien_homer_ss.png");
+	Game::checkInitialized(spriteSheet[HOMER], __FUNCTION__": failed to load dat/gfx/alien_homer_ss.png");
 
-	spriteSheet[BOP] = al_load_bitmap("dat/gfx/alien_bop.png");
-	Game::checkInitialized(spriteSheet[BOP], "dat/gfx/alien_bop.png");
+	spriteSheet[BOP] = al_load_bitmap("dat/gfx/alien_bop_ss.png");
+	Game::checkInitialized(spriteSheet[BOP], __FUNCTION__": failed to load dat/gfx/alien_bop_ss.png");
 
-	spriteSheet[EMAGO] = al_load_bitmap("dat/gfx/alien_emago.png");
-	Game::checkInitialized(spriteSheet[EMAGO], "dat/gfx/alien_emago.png");
+	spriteSheet[EMAGO] = al_load_bitmap("dat/gfx/alien_emago_ss.png");
+	Game::checkInitialized(spriteSheet[EMAGO], __FUNCTION__": failed to load dat/gfx/alien_emago_ss.png");
 
-	spriteSheet[XTC] = al_load_bitmap("dat/gfx/alien_xtc.png");
-	Game::checkInitialized(spriteSheet[XTC], "dat/gfx/alien_xtc.png");
+	spriteSheet[XTC] = al_load_bitmap("dat/gfx/alien_xtc_ss.png");
+	Game::checkInitialized(spriteSheet[XTC], __FUNCTION__": failed to load dat/gfx/alien_xtc_ss.png");
 
-	spriteSheet[THICCBOI] = al_load_bitmap("dat/gfx/alien_thiccboi.png");
-	Game::checkInitialized(spriteSheet[THICCBOI], "dat/gfx/alien_thiccboi.png");
+	spriteSheet[THICCBOI] = al_load_bitmap("dat/gfx/alien_thiccboi_ss.png");
+	Game::checkInitialized(spriteSheet[THICCBOI], __FUNCTION__": failed to load dat/gfx/alien_thiccboi_ss.png");
 }
 
 Aliens::~Aliens()
@@ -82,10 +81,17 @@ void Aliens::update(unsigned long frameCounter, HUD& hm, Missiles& mm, Effects& 
 			{
 				// What is the alien type?
 				alien[i].type = Game::between(BUG, ALIEN_TYPE_COUNT - 1);
-				alien[i].sprite->setBitmap(spriteSheet[alien[i].type], spriteSheetSize[alien[i].type][0], spriteSheetSize[alien[i].type][1]);
-				alien[i].sprite->position.x = Game::between(-spriteSheetSize[alien[i].type][0], bufferWidth);
-				alien[i].sprite->position.y = -spriteSheetSize[alien[i].type][1];
+				// All our spritesheet are just one row and 4 frames. We will skip 3 screen frames for the animation just like our hero
+				alien[i].sprite->setBitmap(spriteSheet[alien[i].type], spriteSheetSize[alien[i].type][0], spriteSheetSize[alien[i].type][1], 3);
 				
+				// Set spawn position
+				alien[i].sprite->position.x = Game::between(0, bufferSize.cx - spriteSheetSize[alien[i].type][0]);
+				alien[i].sprite->position.y = -spriteSheetSize[alien[i].type][1];
+
+				// Set sprite boundary
+				alien[i].sprite->boundary.SetRect(0, -spriteSheetSize[alien[i].type][1], bufferSize.cx - 1, bufferSize.cy + spriteSheetSize[alien[i].type][1]);
+
+				// Set other stuff
 				alien[i].shotTimer = Game::between(1, 99);
 				alien[i].blinkTimer = 0;
 				alien[i].used = true;
@@ -162,7 +168,7 @@ void Aliens::update(unsigned long frameCounter, HUD& hm, Missiles& mm, Effects& 
 			break;
 
 		case VIPER:
-			alien[i].sprite->position.y += 2;
+			alien[i].sprite->position.y++;
 			alien[i].sprite->position.x += alien[i].dx * 2;
 			break;
 
@@ -203,21 +209,18 @@ void Aliens::update(unsigned long frameCounter, HUD& hm, Missiles& mm, Effects& 
 			break;
 		}
 
-		// Clip alien movement horizontally
-		if (alien[i].sprite->position.x < -spriteSheetSize[alien[i].type][0]) alien[i].sprite->position.x = -spriteSheetSize[alien[i].type][0];
-		if (alien[i].sprite->position.x > bufferWidth) alien[i].sprite->position.x = bufferWidth;
-
 		// Remove the alien if it crosses the bottom of the sceeen
-		if (alien[i].sprite->position.y >= bufferWidth)
+		if (alien[i].sprite->position.y >= bufferSize.cy)
 		{
 			alien[i].used = false;
 			continue;
 		}
 
+		// Make the sprites go. Also clips to boundary
+		alien[i].sprite->update();
+
 		if (alien[i].blinkTimer)
 			alien[i].blinkTimer--;
-
-		// NOTE: Moved collision detection to Game class
 
 		// Calculate midpoints of alien sprites
 		int cx = alien[i].sprite->position.x + (spriteSheetSize[alien[i].type][0] / 2);
@@ -290,51 +293,54 @@ void Aliens::update(unsigned long frameCounter, HUD& hm, Missiles& mm, Effects& 
 				break;
 
 			case ARROW:
-				mm.add(mm.ALIEN, true, cx, alien[i].sprite->position.y);
+				mm.add(mm.ALIEN, true, cx, cy + 8);
+				mm.add(mm.ALIEN, true, cx, cy + 13);
 				alien[i].shotTimer = 80;
 				break;
 
 			case VIPER:
-				mm.add(mm.ALIEN, true, cx, alien[i].sprite->position.y);
+				mm.add(mm.ALIEN, true, cx, alien[i].sprite->position.y + alien[i].sprite->size.cy);
 				alien[i].shotTimer = 80;
 				break;
 
 			case GIM72:
-				mm.add(mm.ALIEN, true, cx - 5, cy);
-				mm.add(mm.ALIEN, true, cx + 5, cy);
+				mm.add(mm.ALIEN, true, cx - 23, cy + 3);
+				mm.add(mm.ALIEN, true, cx + 23, cy + 3);
 				alien[i].shotTimer = 150;
 				break;
 
 			case HOMER:
-				mm.add(mm.ALIEN, true, cx - 5, cy);
-				mm.add(mm.ALIEN, true, cx + 5, cy);
+				mm.add(mm.ALIEN, true, cx - 23, cy - 7);
+				mm.add(mm.ALIEN, true, cx + 23, cy - 7);
 				alien[i].shotTimer = 100;
 				break;
 
 			case BOP:
-				mm.add(mm.ALIEN, true, cx - 5, cy);
-				mm.add(mm.ALIEN, true, cx + 5, cy);
+				mm.add(mm.ALIEN, true, cx - 21, cy + 7);
+				mm.add(mm.ALIEN, true, cx + 21, cy + 7);
 				alien[i].shotTimer = 100;
 				break;
 
 			case EMAGO:
-				mm.add(mm.ALIEN, true, cx - 5, cy);
-				mm.add(mm.ALIEN, true, cx + 5, cy);
+				mm.add(mm.ALIEN, true, cx - 21, cy + 16);
+				mm.add(mm.ALIEN, true, cx + 21, cy + 16);
 				alien[i].shotTimer = 100;
 				break;
 
 			case XTC:
-				mm.add(mm.ALIEN, true, cx - 5, cy);
-				mm.add(mm.ALIEN, true, cx + 5, cy);
+				mm.add(mm.ALIEN, true, cx - 28, cy + 10);
+				mm.add(mm.ALIEN, true, cx + 28, cy + 10);
 				alien[i].shotTimer = 100;
 				break;
 
 			case THICCBOI:
-				mm.add(mm.ALIEN, true, cx - 5, cy);
-				mm.add(mm.ALIEN, true, cx + 5, cy);
-				mm.add(mm.ALIEN, true, cx - 5, cy + 8);
-				mm.add(mm.ALIEN, true, cx + 5, cy + 8);
-				alien[i].shotTimer = 200;
+				mm.add(mm.ALIEN, true, cx - 14, cy + 21);
+				mm.add(mm.ALIEN, true, cx - 14, cy + 26);
+				mm.add(mm.ALIEN, true, cx + 14, cy + 21);
+				mm.add(mm.ALIEN, true, cx + 14, cy + 26);
+				mm.add(mm.ALIEN, true, cx - 5, cy + 23);
+				mm.add(mm.ALIEN, true, cx + 5, cy + 23);
+				alien[i].shotTimer = 300;
 				break;
 			}
 		}
@@ -346,9 +352,13 @@ void Aliens::hit(int n, bool critical)
 {
 	// Sanity checks
 	if (n < 0 || n >= ALIENS_N)
+	{
 		Game::checkInitialized(false, __FUNCTION__": Alien index out of range");
+		return;	// removes compiler warnings
+	}
+
 	if (!alien[n].used)
-		Game::checkInitialized(false, __FUNCTION__": Tried to used an inactive alien slot");
+		return;
 
 	if (critical)
 		alien[n].life = 0;
