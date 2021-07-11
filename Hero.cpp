@@ -12,7 +12,7 @@
 
 #include "Hero.h"
 
-Hero::Hero()
+Hero::Hero(HUD& hm)
 {
 	
 	sprite = new Sprite();
@@ -20,10 +20,6 @@ Hero::Hero()
 	// Initialize the buffer width and height
 	bufferWidth = al_get_display_width(al_get_current_display());
 	bufferHeight = al_get_display_height(al_get_current_display());
-
-	sprite->position.x = (bufferWidth / 2) - (sprite->size.cx / 2);
-	sprite->position.y = (bufferHeight / 2) - (sprite->size.cy / 2);
-	sprite->boundary.SetRect(0, 0, bufferWidth, bufferHeight);
 
 	shotTimer = 0;
 	respawnTimer = 0;
@@ -36,6 +32,11 @@ Hero::Hero()
 
 	// Since we have 64x64 bitmap spritesheet and the sheet is just 1 row
 	sprite->setBitmap(tmp_bmp, al_get_bitmap_height(tmp_bmp), al_get_bitmap_height(tmp_bmp), 3);
+
+	// Set sprite position and clipping
+	sprite->position.x = (bufferWidth / 2) - (sprite->size.cx / 2);
+	sprite->position.y = (bufferHeight / 2) - (sprite->size.cy / 2);
+	sprite->boundary.SetRect(0, 0, bufferWidth, hm.HUDStartPosition.y - 1);
 }
 
 Hero::~Hero()
@@ -104,7 +105,8 @@ void Hero::hit(bool critical, HUD& hm, Effects& fm)
 		fm.add(fm.EXPLOSION_SMALL, sprite->position.x + (sprite->size.cx / 2), sprite->position.y + (sprite->size.cy / 2));
 
 		hm.lives--;
-		hm.shield = HUD::SHIELD_MAX;
+		if (hm.lives >= 0)
+			hm.shield = HUD::SHIELD_MAX;
 
 		respawnTimer = RESPAWN_TIMER_DEFAULT;
 		invincibleTimer = INVINCIBLE_TIMER_DEFAULT;

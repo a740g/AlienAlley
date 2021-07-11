@@ -36,7 +36,7 @@ public:
 		ALIEN_TYPE_COUNT
 	};
 
-	const static int ALIENS_N = 8;				// maximum simultaneous aliens on the screen
+	const static int ALIENS_N = 12;				// maximum simultaneous aliens on the screen
 
 	// Aliens array
 	struct

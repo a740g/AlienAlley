@@ -34,6 +34,7 @@ private:
 	ALLEGRO_AUDIO_STREAM* music;							// Streaming music
 	ALLEGRO_TIMER* timer;									// Allegro timer
 	ALLEGRO_EVENT_QUEUE* queue;								// Allegro queue
+	ALLEGRO_FONT* font;										// for drawing game over message
 
 	unsigned char key[ALLEGRO_KEY_MAX];						// Key state array
 	unsigned long frames;									// How many frame did we render?
@@ -54,6 +55,8 @@ private:
 	void checkCollisions();
 
 public:
+	static char message[UCHAR_MAX];							// onscreen message
+
 	// Check if the operation succeeded and handle
 	static void checkInitialized(bool test, const char* description);
 	// Miscellaneous functions
@@ -62,5 +65,6 @@ public:
 
 	Game();
 	~Game();
+	void drawMessage();
 	void run();
 };

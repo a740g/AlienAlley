@@ -12,6 +12,8 @@
 
 #include "Game.h"
 
+char Game::message[UCHAR_MAX];
+
 Game::Game()
 {
 	// Seed the random number generator
@@ -23,6 +25,8 @@ Game::Game()
 
 	// Reset the keyboard state array
 	memset(key, 0, sizeof(key));
+	// Clear debug message
+	memset(message, 0, sizeof(message));
 
 	al_set_new_window_title("Alien Alley");
 	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_FRAMELESS);
@@ -36,6 +40,8 @@ Game::Game()
 	Game::checkInitialized(timer, __FUNCTION__": failed to create Allegro timer");
 	queue = al_create_event_queue();
 	Game::checkInitialized(queue, __FUNCTION__": failed to create Allgro event queue");
+	font = al_create_builtin_font();
+	Game::checkInitialized(font, "font");
 
 	Game::checkInitialized(al_init_image_addon(), __FUNCTION__": failed to initialize Allegro image addon");
 	Game::checkInitialized(al_init_primitives_addon(), __FUNCTION__": failed to initialize Allegro primitives addon");
@@ -64,7 +70,7 @@ Game::Game()
 	FX = new Effects();									// Initialize effects
 	missiles = new Missiles();
 	aliens = new Aliens();
-	hero = new Hero();
+	hero = new Hero(*gameHUD);
 }
 
 Game::~Game()
@@ -84,11 +90,18 @@ Game::~Game()
 
 	al_destroy_audio_stream(music);		// TODO: This should move from here?
 
+	al_destroy_font(font);
 	al_destroy_timer(timer);
 	al_destroy_event_queue(queue);
 	al_shutdown_native_dialog_addon();
 
 	al_destroy_display(display);
+}
+
+void Game::drawMessage()
+{
+	if (message[0] != NULL)
+		al_draw_text(font, al_map_rgb_f(1, 1, 1), screenWidth / 2, screenHeight / 2, ALLEGRO_ALIGN_CENTER, Game::message);
 }
 
 // Check if a Allegro/program initialization succeeded
@@ -104,7 +117,7 @@ void Game::checkInitialized(bool test, const char* description)
 
 int Game::between(int lo, int hi)
 {
-	return lo + (rand() % (hi - lo));
+	return lo + (rand() % (hi - lo + 1));
 }
 
 float Game::between(float lo, float hi)
@@ -136,34 +149,61 @@ void Game::updateKeyboard(ALLEGRO_EVENT* event)
 void Game::checkCollisions()
 {
 	// Check if hero collided with missiles
-	for (int i = 0; i < missiles->SHOTS_N; i++)
+	if (gameHUD->lives >= 0)
 	{
-		if (!missiles->shot[i].used)
-			continue;
-
-		// Don't collide with one's own shots
-		if (missiles->shot[i].type == missiles->HERO)
-			continue;
-
-		if (hero->sprite->collidesWith(*missiles->shot[i].sprite))
+		for (int i = 0; i < missiles->SHOTS_N; i++)
 		{
-			missiles->hit(i, *FX);
-			hero->hit(false, *gameHUD, *FX);
+			if (!missiles->shot[i].used)
+				continue;
+
+			// Don't collide with one's own shots
+			if (missiles->shot[i].type == missiles->HERO)
+				continue;
+
+			if (hero->sprite->collidesWith(*missiles->shot[i].sprite))
+			{
+				missiles->hit(i, *FX);
+				hero->hit(false, *gameHUD, *FX);
+			}
 		}
 	}
 
 	// Check if hero collided with aliens
-	for (int i = 0; i < aliens->ALIENS_N; i++)
+	if (gameHUD->lives >= 0)
 	{
+		for (int i = 0; i < aliens->ALIENS_N; i++)
+		{
+			if (!aliens->alien[i].used)
+				continue;
 
+			if (hero->sprite->collidesWith(*aliens->alien[i].sprite))
+			{
+				aliens->hit(i, true);
+				hero->hit(true, *gameHUD, *FX);
+			}
+		}
 	}
 
 	// Check if aliens collided with missiles
 	for (int m = 0; m < missiles->SHOTS_N; m++)
 	{
+		if (!missiles->shot[m].used)
+			continue;
+
+		// Don't collide with one's own shots
+		if (missiles->shot[m].type == missiles->ALIEN)
+			continue;
+
 		for (int a = 0; a < aliens->ALIENS_N; a++)
 		{
+			if (!aliens->alien[a].used)
+				continue;
 
+			if (aliens->alien[a].sprite->collidesWith(*missiles->shot[m].sprite))
+			{
+				missiles->hit(m, *FX);
+				aliens->hit(a, false);
+			}
 		}
 	}
 }
@@ -224,6 +264,7 @@ void Game::run()
 			FX->draw();
 			hero->draw(*gameHUD);
 			gameHUD->draw();
+			drawMessage();
 
 			al_flip_display();
 			redraw = false;

@@ -26,34 +26,34 @@ private:
 	const static int SHIELD_STATUS_BOTTOM = SHIELD_STATUS_TOP + SHIELD_STATUS_HEIGHT - 1;
 	const static int SCORE_NUMBERS_LEFT = 474;
 	const static int SCORE_NUMBERS_TOP = 24;
-	const static int DIGITS_MAX = 7;																			// max digits on the score panel
+	const static int DIGITS_MAX = 7;															// max digits on the score panel
 
-	ALLEGRO_FONT* font;					// for drawing game over message
-	ALLEGRO_BITMAP* digitSpriteSheet;	// digits bitmap for drawing score
-	int digitSpriteWidth;				// width of each digit
-	int digitSpriteHeight;				// height of each digit
-	ALLEGRO_BITMAP* HUDBitmap;			// bitmap for the HUD panel
-	int HUDStartX;						// framebuffer x to render the HUD
-	int HUDStartY;						// framebuffer y to render the HUD
-	ALLEGRO_BITMAP* lifeBitmap;			// HUD life bitmap
-	int lifeBitmapWidth;				// life bitmap width
-	int lifeBitmapHeight;				// life bitmap height
-	int displayScore;					// score we are going to draw
-	int displayShield;					// shield we are going to draw
-	int bufferWidth;					// framebuffer width
-	int bufferHeight;					// framebuffer height
+	ALLEGRO_FONT* font;																			// for drawing game over message
+	ALLEGRO_BITMAP* digitSpriteSheet;															// digits bitmap for drawing score
+	int digitSpriteWidth;																		// width of each digit
+	int digitSpriteHeight;																		// height of each digit
+	ALLEGRO_BITMAP* HUDBitmap;																	// bitmap for the HUD panel
+	ALLEGRO_BITMAP* lifeBitmap;																	// HUD life bitmap
+	int lifeBitmapWidth;																		// life bitmap width
+	int lifeBitmapHeight;																		// life bitmap height
+	int displayScore;																			// score we are going to draw
+	int displayShield;																			// shield we are going to draw
+	int bufferWidth;																			// framebuffer width
+	int bufferHeight;																			// framebuffer height
 
 	static int getDigit(int n, int p);
 
 public:
 
 	const static int SHIELD_MAX = SHIELD_STATUS_WIDTH;
-	const static int SCORE_MAX = 9999999;						// this should align with DIGITS_MAX
+	const static int SCORE_MAX = 9999999;														// this should align with DIGITS_MAX
 	const static int LIVES_MAX = 4;
 
-	int score;							// game scrore
-	int lives;							// game lives
-	int shield;							// game shield
+	CPoint HUDStartPosition;																	// framebuffer x,y to render the HUD
+
+	int score;																					// game scrore
+	int lives;																					// game lives
+	int shield;																					// game shield
 
 	// HUD constructor
 	HUD();

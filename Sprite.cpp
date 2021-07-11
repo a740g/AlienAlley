@@ -17,12 +17,24 @@ Sprite::Sprite(ALLEGRO_BITMAP* ssBitmap, int width, int height, int frameSkip)
 	setBitmap(ssBitmap, width, height, frameSkip);
 }
 
+void Sprite::reset()
+{
+	spriteSheet = nullptr;
+	size.SetSize(0, 0);
+	frames.SetSize(0, 0);
+	currentFrame = 0;
+	animationDirection = 0;
+	playCount = 0;
+	frameSkipMax = 0;
+	frameSkipCount = 0;
+	boundary.SetRectEmpty();
+}
+
 bool Sprite::setBitmap(ALLEGRO_BITMAP* ssBitmap, int width, int height, int frameSkip)
 {
-	// We can safely do this because our sprite class does not manage bitmaps
-	reset();
-
 	if (ssBitmap == nullptr) return false;
+
+	reset();											// reset all sprite properties
 	spriteSheet = ssBitmap;
 
 	// Check if we have a sprite sheet
@@ -41,9 +53,8 @@ bool Sprite::setBitmap(ALLEGRO_BITMAP* ssBitmap, int width, int height, int fram
 		animationDirection = 1;							// forward animation
 	}
 
-	currentFrame = 0;
 	frameSkipMax = frameSkip;
-	frameSkipCount = 0;
+
 	return true;
 }
 
@@ -107,17 +118,4 @@ bool Sprite::setFrame(int n)
 
 	currentFrame = n;
 	return true;
-}
-
-void Sprite::reset()
-{
-	spriteSheet = nullptr;
-	size.SetSize(0, 0);
-	frames.SetSize(0, 0);
-	currentFrame = 0;
-	animationDirection = 0;
-	playCount = 0;
-	frameSkipMax = 0;
-	frameSkipCount = 0;
-	boundary.SetRectEmpty();
 }

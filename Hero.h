@@ -35,7 +35,7 @@ public:
 	// Hero sprite
 	Sprite* sprite;
 
-	Hero();
+	Hero(HUD& hm);
 	~Hero();
 	// Update hero location, add missiles and effects based on input
 	void update(bool moveLeft, bool moveRight, bool moveUp, bool moveDown, bool shoot, HUD& hm, Missiles& mm);

@@ -37,8 +37,8 @@ HUD::HUD()
 
     HUDBitmap = al_load_bitmap("dat/gfx/hud.png");
     Game::checkInitialized(HUDBitmap, "dat/gfx/hud.png");
-    HUDStartX = bufferWidth / 2 - al_get_bitmap_width(HUDBitmap) / 2;       // center horizontally
-    HUDStartY = bufferHeight - al_get_bitmap_height(HUDBitmap);             // align to the bottom
+    // Center & align to the bottom
+    HUDStartPosition.SetPoint(bufferWidth / 2 - al_get_bitmap_width(HUDBitmap) / 2, bufferHeight - al_get_bitmap_height(HUDBitmap));
 
     lifeBitmap = al_load_bitmap("dat/gfx/life.png");
     Game::checkInitialized(lifeBitmap, "dat/gfx/life.png");
@@ -94,15 +94,15 @@ void HUD::draw()
     int spacing, digit, i, j;
 
     // First draw the HUD panel
-    al_draw_bitmap(HUDBitmap, HUDStartX, HUDStartY, 0);
+    al_draw_bitmap(HUDBitmap, HUDStartPosition.x, HUDStartPosition.y, 0);
 
     // Now draw the shield
-    al_draw_filled_rectangle(SHIELD_STATUS_LEFT + HUDStartX, SHIELD_STATUS_TOP + HUDStartY, SHIELD_STATUS_LEFT + HUDStartX + displayShield, SHIELD_STATUS_BOTTOM + HUDStartY, al_map_rgb_f(1, (float)displayShield / (float)SHIELD_MAX, (float)lives / (float)LIVES_MAX));
+    al_draw_filled_rectangle(SHIELD_STATUS_LEFT + HUDStartPosition.x, SHIELD_STATUS_TOP + HUDStartPosition.y, SHIELD_STATUS_LEFT + HUDStartPosition.x + displayShield, SHIELD_STATUS_BOTTOM + HUDStartPosition.y, al_map_rgb_f(1, (float)displayShield / (float)SHIELD_MAX, (float)lives / (float)LIVES_MAX));
 
     // Now draw the lives
     spacing = lifeBitmapWidth + 2;
     for (i = 0; i < lives; i++)
-        al_draw_bitmap(lifeBitmap, 2 + SHIELD_STATUS_LEFT + HUDStartX + i * spacing, 2 + SHIELD_STATUS_TOP + HUDStartY, 0);
+        al_draw_bitmap(lifeBitmap, 2 + SHIELD_STATUS_LEFT + HUDStartPosition.x + i * spacing, 2 + SHIELD_STATUS_TOP + HUDStartPosition.y, 0);
 
     // Now draw the score
     spacing = digitSpriteWidth;
@@ -110,7 +110,7 @@ void HUD::draw()
     for (i = DIGITS_MAX - 1; i >= 0 ; i--)
     {
         digit = getDigit(displayScore, i);
-        al_draw_bitmap_region(digitSpriteSheet, digit * digitSpriteWidth, 0, digitSpriteWidth, digitSpriteHeight, SCORE_NUMBERS_LEFT + HUDStartX + j * digitSpriteWidth, SCORE_NUMBERS_TOP + HUDStartY, 0);
+        al_draw_bitmap_region(digitSpriteSheet, digit * digitSpriteWidth, 0, digitSpriteWidth, digitSpriteHeight, SCORE_NUMBERS_LEFT + HUDStartPosition.x + j * digitSpriteWidth, SCORE_NUMBERS_TOP + HUDStartPosition.y, 0);
         j++;
     }
 
