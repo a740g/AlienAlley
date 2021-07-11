@@ -14,7 +14,7 @@
 
 #include "AlienAlley.h"
 
-// This is here it avoid a compiler error
+// Forward declarations
 class Sprite;
 
 class Effects

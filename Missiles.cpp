@@ -19,7 +19,7 @@ Missiles::Missiles()
 	{
 		shot[i].sprite = new Sprite();
 		shot[i].used = false;
-		shot[i].dx = shot[i].dy = 0;
+		shot[i].direction.SetSize(0, 0);
 		shot[i].type = HERO;
 	}
 
@@ -67,8 +67,8 @@ void Missiles::update()
 		switch (shot[i].type)
 		{
 		case HERO:
-			//shot[i].sprite->position.x += shot[i].dx;		// not required. hero always shoots straight up
-			shot[i].sprite->position.y += shot[i].dy;		// here dy should be negative
+			//shot[i].sprite->position.x += shot[i].dx;				// not required. hero always shoots straight up
+			shot[i].sprite->position.y += shot[i].direction.cy;		// here dy should be negative
 
 			// Remove the missile if it goes off screen
 			if (shot[i].sprite->position.y < -(shot[i].sprite->size.cy))
@@ -80,8 +80,8 @@ void Missiles::update()
 
 		case ALIEN:
 			// Move missils in dx, dy directions
-			shot[i].sprite->position.x += shot[i].dx;
-			shot[i].sprite->position.y += shot[i].dy;
+			shot[i].sprite->position.x += shot[i].direction.cx;
+			shot[i].sprite->position.y += shot[i].direction.cy;
 
 			// Remove the missile if it goes off screen
 			if ((shot[i].sprite->position.x < -(shot[i].sprite->size.cx)) || (shot[i].sprite->position.x > bufferWidth) || (shot[i].sprite->position.y < -(shot[i].sprite->size.cy)) || (shot[i].sprite->position.y > bufferHeight))
@@ -95,6 +95,20 @@ void Missiles::update()
 			Game::checkInitialized(false, __FUNCTION__": case not handled");
 		}
 	}
+}
+
+// This is called by the collision detector if the missile collided with something
+void Missiles::hit(int n, Effects& fm)
+{
+	// Sanity checks
+	if (n < 0 || n >= SHOTS_N)
+		Game::checkInitialized(false, __FUNCTION__": Missile index out of range");
+	if (!shot[n].used)
+		Game::checkInitialized(false, __FUNCTION__": Tried to used an inactive missile slot");
+
+	// Queue sparks if the missile hit something
+	fm.add(fm.SPARKS, shot[n].sprite->position.x + (shot[n].sprite->size.cx / 2), shot[n].sprite->position.y + (shot[n].sprite->size.cy / 2));
+	shot[n].used = false;
 }
 
 // Draw all missiles
@@ -132,8 +146,8 @@ bool Missiles::add(unsigned int type, bool straight, int x, int y)
 		shot[slot].sprite->position.x = x - (spriteSheetSize[type][0] / 2);		// center the missle
 		shot[slot].sprite->position.y = y;
 
-		shot[slot].dx = 0;												// straight up
-		shot[slot].dy = -5;												// missile will travel 5 pixels to the top of the screen
+		shot[slot].direction.cx = 0;											// straight up
+		shot[slot].direction.cy = -5;											// missile will travel 5 pixels to the top of the screen
 	}
 	else // alien
 	{
@@ -142,18 +156,18 @@ bool Missiles::add(unsigned int type, bool straight, int x, int y)
 
 		if (straight)
 		{
-			shot[slot].dx = 0;
-			shot[slot].dy = 2;
+			shot[slot].direction.cx = 0;
+			shot[slot].direction.cy = 2;
 		}
 		else
 		{
 
-			shot[slot].dx = Game::between(-2, 2);
-			shot[slot].dy = Game::between(-2, 2);
+			shot[slot].direction.cx = Game::between(-2, 2);
+			shot[slot].direction.cy = Game::between(-2, 2);
 		}
 
 		// if the shot has no speed, don't bother
-		if (!shot[slot].dx && !shot[slot].dy)
+		if (!shot[slot].direction.cx && !shot[slot].direction.cy)
 			return true;
 	}
 

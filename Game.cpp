@@ -56,7 +56,7 @@ Game::Game()
 	/* load high-score file */
 	//TODO: HighScoresLoad()
 
-	al_hide_mouse_cursor(display);		// TODO: we need to move this to a good place later
+	al_hide_mouse_cursor(display);		// TODO: we need to move this to a good place later?
 
 	mainMenu = new MainMenu();							// Initialize main menu
 	celestialObjects = new CelestialObjects();			// Initizlize celestial objects
@@ -112,7 +112,7 @@ float Game::between(float lo, float hi)
 	return lo + ((float)rand() / (float)RAND_MAX) * (hi - lo);
 }
 
-// --- keyboard ---
+// Updates the keyboard state array
 void Game::updateKeyboard(ALLEGRO_EVENT* event)
 {
 	switch (event->type)
@@ -132,87 +132,41 @@ void Game::updateKeyboard(ALLEGRO_EVENT* event)
 	}
 }
 
-bool shots_collide(bool is_ship, int x, int y, int w, int h)
-{
-	for (int i = 0; i < SHOTS_N; i++)
-	{
-		if (!shots[i].used)
-			continue;
-
-		// don't collide with one's own shots
-		if (shots[i].ship == is_ship)
-			continue;
-
-		int sw, sh;
-		if (is_ship)
-		{
-			sw = sprites.alien_shot_d.w;
-			sh = sprites.alien_shot_d.h;
-		}
-		else
-		{
-			sw = sprites.ship_shot_d.w;
-			sh = sprites.ship_shot_d.h;
-		}
-
-		if (collide(x, y, x + w, y + h, shots[i].x, shots[i].y, shots[i].x + sw, shots[i].y + sh))
-		{
-			FX->add(FX->SPARKS, shots[i].x + (sw / 2), shots[i].y + (sh / 2));
-			shots[i].used = false;
-			return true;
-		}
-	}
-
-	return false;
-}
-
 // Checks for all possible collisions
 void Game::checkCollisions()
 {
-	// Hero
-	if (hero->invincibleTimer)
-		hero->invincibleTimer--;
-	else
+	// Check if hero collided with missiles
+	for (int i = 0; i < missiles->SHOTS_N; i++)
 	{
-		if (shots_collide(true, ship.sprite.position.x, ship.sprite.position.y, ship.sprite.size.cx, ship.sprite.size.cy))
+		if (!missiles->shot[i].used)
+			continue;
+
+		// Don't collide with one's own shots
+		if (missiles->shot[i].type == missiles->HERO)
+			continue;
+
+		if (hero->sprite->collidesWith(*missiles->shot[i].sprite))
 		{
-			ship.shield -= 2;
-			if (ship.shield <= 0 && ship.lives > 0)
-			{
-				int x = ship.sprite.position.x + (ship.sprite.size.cx / 2);
-				int y = ship.sprite.position.y + (ship.sprite.size.cy / 2);
-				FX->add(FX->EXPLOSION_SMALL, x, y);
-
-				ship.lives--;
-				ship.shield = HUD::SHIELD_MAX;
-
-				ship.respawn_timer = 90;
-				ship.invincible_timer = 180;
-			}
-
+			missiles->hit(i, *FX);
+			hero->hit(false, *gameHUD, *FX);
 		}
 	}
 
-	// Alien
-	if (shots_collide(false, aliens[i].x, aliens[i].y, sprites.alien_d[aliens[i].type].w, sprites.alien_d[aliens[i].type].h))
+	// Check if hero collided with aliens
+	for (int i = 0; i < aliens->ALIENS_N; i++)
 	{
-		aliens[i].life--;
-		aliens[i].blink = 4;
+
 	}
 
+	// Check if aliens collided with missiles
+	for (int m = 0; m < missiles->SHOTS_N; m++)
+	{
+		for (int a = 0; a < aliens->ALIENS_N; a++)
+		{
+
+		}
+	}
 }
-
-
-bool collide(int ax1, int ay1, int ax2, int ay2, int bx1, int by1, int bx2, int by2)
-{
-	if (ax1 > bx2) return false;
-	if (ax2 < bx1) return false;
-	if (ay1 > by2) return false;
-	if (ay2 < by1) return false;
-
-	return true;
-}
-
 
 // This has the main game loop
 void Game::run()
@@ -238,9 +192,10 @@ void Game::run()
 			FX->update();
 			missiles->update();
 			celestialObjects->update(key[ALLEGRO_KEY_UP]);		// TODO: this needs to the input agnostic
-			hero->update(gameHUD->lives, key[ALLEGRO_KEY_LEFT], key[ALLEGRO_KEY_RIGHT], key[ALLEGRO_KEY_UP], key[ALLEGRO_KEY_DOWN], key[ALLEGRO_KEY_LCTRL] || key[ALLEGRO_KEY_SPACE] || key[ALLEGRO_KEY_RCTRL], *missiles);
-			aliens->update();
+			hero->update(key[ALLEGRO_KEY_LEFT], key[ALLEGRO_KEY_RIGHT], key[ALLEGRO_KEY_UP], key[ALLEGRO_KEY_DOWN], key[ALLEGRO_KEY_LCTRL] || key[ALLEGRO_KEY_SPACE] || key[ALLEGRO_KEY_RCTRL], *gameHUD, *missiles);
+			aliens->update(frames, *gameHUD, *missiles, *FX);
 			gameHUD->update();
+			checkCollisions();
 
 			if (key[ALLEGRO_KEY_ESCAPE])
 				done = true;
@@ -267,7 +222,7 @@ void Game::run()
 			aliens->draw();
 			missiles->draw();
 			FX->draw();
-			hero->draw();
+			hero->draw(*gameHUD);
 			gameHUD->draw();
 
 			al_flip_display();

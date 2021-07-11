@@ -14,6 +14,9 @@
 
 #include "AlienAlley.h"
 
+// Forward declarations
+class Effects;
+
 class Missiles
 {
 public:
@@ -25,32 +28,35 @@ public:
 		MISSILES_TYPE_COUNT
 	};
 
+	const static int SHOTS_N = 256;
+
+	// Missiles array
+	struct
+	{
+		Sprite* sprite;
+		CSize direction;
+		int type;
+		bool used;
+	} shot[SHOTS_N];
+
 	Missiles();
 	~Missiles();
 	// Update all missile locations, sprites etc.
 	void update();
+	// This is called by the collision detector if the missile collided with something
+	void hit(int n, Effects& fm);
 	// Draw all missiles
 	void draw();
 	// Add a missile from an object on the screen
 	bool add(unsigned int type, bool straight, int x, int y);
 
 private:
-	const static int SHOTS_N = 256;
 
 	// Sprite sizes in spritesheets
 	const int spriteSheetSize[MISSILES_TYPE_COUNT][2] = { {4, 18}, {5, 5} };
 	 
 	int bufferWidth;		// Screen width for audio panning & clipping sprites
 	int bufferHeight;		// For clipping sprites
-
-	// Missiles array
-	struct
-	{
-		Sprite* sprite;
-		int dx, dy;
-		int type;
-		bool used;
-	} shot[SHOTS_N];
 
 	// Effects sprite sheets
 	ALLEGRO_BITMAP* spriteSheet[MISSILES_TYPE_COUNT];

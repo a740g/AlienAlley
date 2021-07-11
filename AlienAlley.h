@@ -20,12 +20,13 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_audio.h>
+
 #include "Sprite.h"
 #include "MainMenu.h"
 #include "HUD.h"
-#include "CelestialObjects.h"
 #include "Effects.h"
+#include "CelestialObjects.h"
 #include "Missiles.h"
-#include "Hero.h"
 #include "Aliens.h"
+#include "Hero.h"
 #include "Game.h"

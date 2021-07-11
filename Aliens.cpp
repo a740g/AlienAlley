@@ -69,7 +69,7 @@ Aliens::~Aliens()
 }
 
 // Run alien AI, update location & sprite
-void Aliens::update(unsigned long frameCounter, Missiles& mm, Effects& fm, HUD& hm)
+void Aliens::update(unsigned long frameCounter, HUD& hm, Missiles& mm, Effects& fm)
 {
 	int new_quota =	(frameCounter % 120) ? 0 : Game::between(2, 4);
 
@@ -341,6 +341,23 @@ void Aliens::update(unsigned long frameCounter, Missiles& mm, Effects& fm, HUD& 
 	}
 }
 
+// This is called by the collision detector if the alien collided with something
+void Aliens::hit(int n, bool critical)
+{
+	// Sanity checks
+	if (n < 0 || n >= ALIENS_N)
+		Game::checkInitialized(false, __FUNCTION__": Alien index out of range");
+	if (!alien[n].used)
+		Game::checkInitialized(false, __FUNCTION__": Tried to used an inactive alien slot");
+
+	if (critical)
+		alien[n].life = 0;
+	else
+		alien[n].life--;
+	
+	alien[n].blinkTimer = 4;
+}
+
 // Draw aliens
 void Aliens::draw()
 {
@@ -348,7 +365,7 @@ void Aliens::draw()
 	{
 		if (!alien[i].used)
 			continue;
-		if (alien[i].blinkTimer > 2)
+		if (alien[i].blinkTimer > 2)	// TODO: ???
 			continue;
 
 		alien[i].sprite->draw();

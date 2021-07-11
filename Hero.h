@@ -14,27 +14,32 @@
 
 #include "AlienAlley.h"
 
+// Forward declarations
+class Sprite;
+
 class Hero
 {
 private:
 	const static int SPEED_DEFAULT = 3;
-	const static int INVINCIBLE_TIMER_DEFAULT = 120;
+	const static int INVINCIBLE_TIMER_DEFAULT = 180;
+	const static int RESPAWN_TIMER_DEFAULT = 90;
 
 	int bufferWidth;					// framebuffer width
 	int bufferHeight;					// framebuffer height
 	int shotTimer;						// can we shoot?
 	int respawnTimer;					// can we respawn?
 	int invincibleTimer;				// hero invincibility
-	int lives;							// this should be sync'ed from the HUD
 	int speed;							// hero speed
 
 public:
 	// Hero sprite
-	Sprite sprite;
+	Sprite* sprite;
 
 	Hero();
 	~Hero();
 	// Update hero location, add missiles and effects based on input
-	void update(int gameLives, bool moveLeft, bool moveRight, bool moveUp, bool moveDown, bool shoot, Missiles& mm, Effects& fm);
-	void draw();
+	void update(bool moveLeft, bool moveRight, bool moveUp, bool moveDown, bool shoot, HUD& hm, Missiles& mm);
+	// This is called by the collision detector if the hero collided with something
+	void hit(bool critical, HUD& hm, Effects& fm);
+	void draw(HUD& hm);
 };

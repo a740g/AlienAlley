@@ -14,6 +14,12 @@
 
 #include "AlienAlley.h"
 
+// Forward declarations
+class Aliens;
+class CelestialObjects;
+class Hero;
+class MainMenu;
+
 class Game
 {
 private:
@@ -44,7 +50,6 @@ private:
 	Aliens* aliens;
 
 	void updateKeyboard(ALLEGRO_EVENT* event);
-
 	// Checks for all possible collisions
 	void checkCollisions();
 
