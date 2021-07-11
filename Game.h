@@ -55,7 +55,9 @@ private:
 	void checkCollisions();
 
 public:
+#ifdef DEBUG
 	static char message[UCHAR_MAX];							// onscreen message
+#endif // DEBUG
 
 	// Check if the operation succeeded and handle
 	static void checkInitialized(bool test, const char* description);
@@ -65,6 +67,8 @@ public:
 
 	Game();
 	~Game();
+#ifdef DEBUG
 	void drawMessage();
+#endif // DEBUG
 	void run();
 };

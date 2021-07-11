@@ -68,7 +68,7 @@ Aliens::~Aliens()
 }
 
 // Run alien AI, update location & sprite
-void Aliens::update(unsigned long frameCounter, HUD& hm, Missiles& mm, Effects& fm)
+void Aliens::update(unsigned long frameCounter, Hero& ship, HUD& hm, Missiles& mm, Effects& fm)
 {
 	int new_quota =	(frameCounter % 120) ? 0 : Game::between(2, 4);
 
@@ -144,9 +144,14 @@ void Aliens::update(unsigned long frameCounter, HUD& hm, Missiles& mm, Effects& 
 		// Check direction movement and set direction
 		if (alien[i].directionTimer > 0)
 			alien[i].directionTimer--;
-		else
+		else if (frameCounter % 3 == 0 && hm.lives >= 0 && ship.sprite->position.y + ship.sprite->size.cy >= alien[i].sprite->position.y)		// every 3 frames the alien ship will try to seek the hero
 		{
-			alien[i].directionTimer = 20 + rand() % 51;
+			alien[i].directionTimer = ALIEN_MOVE_TIME_BASE + rand() % ALIEN_MOVE_TIME_VAR;
+			alien[i].dx = (alien[i].sprite->position.x > ship.sprite->position.x ? -1 : 1);
+		}
+		else																																	// else alien will roam
+		{
+			alien[i].directionTimer = ALIEN_MOVE_TIME_BASE + rand() % ALIEN_MOVE_TIME_VAR;
 			alien[i].dx = Game::between(-1, 1);
 		}
 
@@ -283,7 +288,7 @@ void Aliens::update(unsigned long frameCounter, HUD& hm, Missiles& mm, Effects& 
 
 		// Check if the alien can shoot and then handle shooting per alien type
 		alien[i].shotTimer--;
-		if (alien[i].shotTimer == 0)
+		if (alien[i].shotTimer == 0 && hm.lives >= 0)
 		{
 			switch (alien[i].type)
 			{

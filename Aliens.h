@@ -17,6 +17,7 @@
 // Forward declarations
 class HUD;
 class Missiles;
+class Hero;
 
 class Aliens
 {
@@ -54,13 +55,16 @@ public:
 	Aliens();
 	~Aliens();
 	// Run alien AI, update location & sprites
-	void update(unsigned long frameCounter, HUD& hm, Missiles& mm, Effects& fm);
+	void update(unsigned long frameCounter, Hero& ship, HUD& hm, Missiles& mm, Effects& fm);
 	// This is called by the collision detector if the alien collided with something
 	void hit(int n, bool critical);
 	// Draw alien
 	void draw();
 
 private:
+	const static int ALIEN_MOVE_TIME_VAR = 75;
+	const static int ALIEN_MOVE_TIME_BASE = 25;
+
 	// Sprite sizes in spritesheets
 	const int spriteSheetSize[ALIEN_TYPE_COUNT][2] = { {30, 17}, {32, 32}, {32, 32}, {64, 64}, {64, 64}, {64, 64}, {64, 64}, {64, 64}, {80, 75} };
 

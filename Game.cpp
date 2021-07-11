@@ -12,7 +12,9 @@
 
 #include "Game.h"
 
+#ifdef DEBUG
 char Game::message[UCHAR_MAX];
+#endif // DEBUG
 
 Game::Game()
 {
@@ -25,8 +27,11 @@ Game::Game()
 
 	// Reset the keyboard state array
 	memset(key, 0, sizeof(key));
+
+#ifdef DEBUG
 	// Clear debug message
 	memset(message, 0, sizeof(message));
+#endif // DEBUG
 
 	al_set_new_window_title("Alien Alley");
 	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_FRAMELESS);
@@ -98,11 +103,13 @@ Game::~Game()
 	al_destroy_display(display);
 }
 
+#ifdef DEBUG
 void Game::drawMessage()
 {
 	if (message[0] != NULL)
 		al_draw_text(font, al_map_rgb_f(1, 1, 1), screenWidth / 2, screenHeight / 2, ALLEGRO_ALIGN_CENTER, Game::message);
 }
+#endif // DEBUG
 
 // Check if a Allegro/program initialization succeeded
 // If not, it just ends with EXIT_FAILURE
@@ -233,7 +240,7 @@ void Game::run()
 			missiles->update();
 			celestialObjects->update(key[ALLEGRO_KEY_UP]);		// TODO: this needs to the input agnostic
 			hero->update(key[ALLEGRO_KEY_LEFT], key[ALLEGRO_KEY_RIGHT], key[ALLEGRO_KEY_UP], key[ALLEGRO_KEY_DOWN], key[ALLEGRO_KEY_LCTRL] || key[ALLEGRO_KEY_SPACE] || key[ALLEGRO_KEY_RCTRL], *gameHUD, *missiles);
-			aliens->update(frames, *gameHUD, *missiles, *FX);
+			aliens->update(frames, *hero, *gameHUD, *missiles, *FX);
 			gameHUD->update();
 			checkCollisions();
 
@@ -264,7 +271,9 @@ void Game::run()
 			FX->draw();
 			hero->draw(*gameHUD);
 			gameHUD->draw();
+#ifdef DEBUG
 			drawMessage();
+#endif // DEBUG
 
 			al_flip_display();
 			redraw = false;
