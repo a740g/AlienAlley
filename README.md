@@ -1,7 +1,7 @@
 # AlienAlley
 ![Screenshot](screenshot.png)
 
-Source port & Mod of the Alien Alley demo game by Dave Roberts.
+Sourceport / mod of the Alien Alley demo game by Dave Roberts.
 
 The Alien Alley demo game was written by Dave Roberts that came with the book PC Game Programming Explorer.
 The book explains how to write games for MS-DOS. I bought the book a long time ago.

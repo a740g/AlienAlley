@@ -6,7 +6,7 @@
 // /_/   \_\_|_|\___|_| |_| /_/   \_\_|_|\___|\__, |
 //                                            |___/
 //
-//  Conversion/port copyright © Samuel Gomes & Neil Gomes, 1998-2020.
+//  Sourceport / mod copyright © Samuel Gomes
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -44,8 +44,8 @@ private:
 	// Sprite sizes in spritesheets
 	const int spriteSheetSize[EFFECTS_TYPE_COUNT][2] = { {20, 20}, {32, 32}, {64, 64}, {80, 80} };
 
-	// Screen width for audio panning
-	int bufferWidth;
+	// Framebuffer size for audio panning
+	CSize bufferSize;
 
 	// Effects array
 	struct

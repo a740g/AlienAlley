@@ -6,7 +6,7 @@
 // /_/   \_\_|_|\___|_| |_| /_/   \_\_|_|\___|\__, |
 //                                            |___/
 //
-//  Conversion/port copyright © Samuel Gomes & Neil Gomes, 1998-2020.
+//  Sourceport / mod copyright © Samuel Gomes
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -55,9 +55,8 @@ private:
 	// Sprite sizes in spritesheets
 	const int spriteSheetSize[MISSILES_TYPE_COUNT][2] = { {4, 18}, {5, 5} };
 	 
-	int bufferWidth;		// Screen width for audio panning & clipping sprites
-	int bufferHeight;		// For clipping sprites
-
+	// Framebuffer size for audio panning & clipping sprites
+	CSize bufferSize;
 	// Effects sprite sheets
 	ALLEGRO_BITMAP* spriteSheet[MISSILES_TYPE_COUNT];
 	// Missile sounds

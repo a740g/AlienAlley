@@ -6,7 +6,7 @@
 // /_/   \_\_|_|\___|_| |_| /_/   \_\_|_|\___|\__, |
 //                                            |___/
 //
-//  Conversion/port copyright © Samuel Gomes & Neil Gomes, 1998-2020.
+//  Sourceport / mod copyright © Samuel Gomes
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -23,7 +23,7 @@ Effects::Effects()
 	}
 
 	// Initialize the buffer width and height
-	bufferWidth = al_get_display_width(al_get_current_display());
+	bufferSize.SetSize(al_get_display_width(al_get_current_display()), al_get_display_height(al_get_current_display()));
 
 	// Load the effects sprite sheets
 	spriteSheet[SPARKS] = al_load_bitmap("dat/gfx/sparks_ss.png");
@@ -74,7 +74,7 @@ bool Effects::add(unsigned int type, int x, int y)
 	if (slot >= FX_N) return false;
 
 	// Pan and play the effects sound. TODO: Special handling for SPARKS > lower gain
-	al_play_sample(sample[type], 1, (2.0f * (float)x / (float)(bufferWidth - 1)) - 1.0f, 1, ALLEGRO_PLAYMODE_ONCE, nullptr);
+	al_play_sample(sample[type], 1, (2.0f * (float)x / (float)(bufferSize.cx - 1)) - 1.0f, 1, ALLEGRO_PLAYMODE_ONCE, nullptr);
 
 	fx[slot].type = type;
 	fx[slot].used = true;

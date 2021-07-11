@@ -6,14 +6,16 @@
 // /_/   \_\_|_|\___|_| |_| /_/   \_\_|_|\___|\__, |
 //                                            |___/
 //
-//  Source port / mod copyright © Samuel Gomes & Neil Gomes
+//  Sourceport / mod copyright © Samuel Gomes
 //
 ///////////////////////////////////////////////////////////////////////
 
 #pragma once
 
 #include <atltypes.h>
+#ifdef DEBUG
 #include <stdio.h>
+#endif // DEBUG
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_image.h>

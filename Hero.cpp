@@ -6,7 +6,7 @@
 // /_/   \_\_|_|\___|_| |_| /_/   \_\_|_|\___|\__, |
 //                                            |___/
 //
-//  Conversion/port copyright © Samuel Gomes & Neil Gomes, 1998-2020.
+//  Sourceport / mod copyright © Samuel Gomes
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -18,8 +18,7 @@ Hero::Hero(HUD& hm)
 	sprite = new Sprite();
 
 	// Initialize the buffer width and height
-	bufferWidth = al_get_display_width(al_get_current_display());
-	bufferHeight = al_get_display_height(al_get_current_display());
+	bufferSize.SetSize(al_get_display_width(al_get_current_display()), al_get_display_height(al_get_current_display()));
 
 	shotTimer = 0;
 	respawnTimer = 0;
@@ -34,9 +33,9 @@ Hero::Hero(HUD& hm)
 	sprite->setBitmap(tmp_bmp, al_get_bitmap_height(tmp_bmp), al_get_bitmap_height(tmp_bmp), 3);
 
 	// Set sprite position and clipping
-	sprite->position.x = (bufferWidth / 2) - (sprite->size.cx / 2);
-	sprite->position.y = (bufferHeight / 2) - (sprite->size.cy / 2);
-	sprite->boundary.SetRect(0, 0, bufferWidth - 1, hm.HUDStartPosition.y - 1);
+	sprite->position.x = (bufferSize.cx / 2) - (sprite->size.cx / 2);
+	sprite->position.y = (bufferSize.cy / 2) - (sprite->size.cy / 2);
+	sprite->boundary.SetRect(0, 0, bufferSize.cx - 1, hm.HUDStartPosition.y - 1);
 }
 
 Hero::~Hero()

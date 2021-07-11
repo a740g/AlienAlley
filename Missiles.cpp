@@ -6,7 +6,7 @@
 // /_/   \_\_|_|\___|_| |_| /_/   \_\_|_|\___|\__, |
 //                                            |___/
 //
-//  Conversion/port copyright © Samuel Gomes & Neil Gomes, 1998-2020.
+//  Sourceport / mod copyright © Samuel Gomes
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -24,8 +24,7 @@ Missiles::Missiles()
 	}
 
 	// Initialize the buffer width and height
-	bufferWidth = al_get_display_width(al_get_current_display());
-	bufferHeight = al_get_display_height(al_get_current_display());
+	bufferSize.SetSize(al_get_display_width(al_get_current_display()), al_get_display_height(al_get_current_display()));
 
 	// Load the missile sprite sheets
 	spriteSheet[HERO] = al_load_bitmap("dat/gfx/missile_hero_ss.png");
@@ -84,7 +83,7 @@ void Missiles::update()
 			shot[i].sprite->position.y += shot[i].direction.cy;
 
 			// Remove the missile if it goes off screen
-			if ((shot[i].sprite->position.x < -(shot[i].sprite->size.cx)) || (shot[i].sprite->position.x > bufferWidth) || (shot[i].sprite->position.y < -(shot[i].sprite->size.cy)) || (shot[i].sprite->position.y > bufferHeight))
+			if ((shot[i].sprite->position.x < -(shot[i].sprite->size.cx)) || (shot[i].sprite->position.x > bufferSize.cx) || (shot[i].sprite->position.y < -(shot[i].sprite->size.cy)) || (shot[i].sprite->position.y > bufferSize.cy))
 			{
 				shot[i].used = false;
 			}
@@ -179,7 +178,7 @@ bool Missiles::add(unsigned int type, bool straight, int x, int y)
 	shot[slot].used = true;
 
 	// Pan and play the effects sound. TODO: Centering must account sprite size here and also elsewhere
-	al_play_sample(sample[type], 1, (2.0f * (float)x / (float)(bufferWidth - 1)) - 1.0f, 1, ALLEGRO_PLAYMODE_ONCE, nullptr);
+	al_play_sample(sample[type], 1, (2.0f * (float)x / (float)(bufferSize.cx - 1)) - 1.0f, 1, ALLEGRO_PLAYMODE_ONCE, nullptr);
 
 	return true;
 }

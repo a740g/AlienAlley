@@ -6,7 +6,7 @@
 // /_/   \_\_|_|\___|_| |_| /_/   \_\_|_|\___|\__, |
 //                                            |___/
 //
-//  Conversion/port copyright © Samuel Gomes & Neil Gomes, 1998-2020.
+//  Sourceport / mod copyright © Samuel Gomes
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -38,8 +38,7 @@ private:
 
 	unsigned char key[ALLEGRO_KEY_MAX];						// Key state array
 	unsigned long frames;									// How many frame did we render?
-	int screenWidth = 640;									// Screen width - this is updated later
-	int screenHeight = 480;									// Screen height - this is updated later
+	CSize screenSize;										// Screen width & Screen height - this is updated later
 
 	// Game objects
 	MainMenu* mainMenu;

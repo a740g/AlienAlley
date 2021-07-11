@@ -6,7 +6,7 @@
 // /_/   \_\_|_|\___|_| |_| /_/   \_\_|_|\___|\__, |
 //                                            |___/
 //
-//  Conversion/port copyright © Samuel Gomes & Neil Gomes, 1998-2020.
+//  Sourceport / mod copyright © Samuel Gomes
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -35,11 +35,12 @@ Game::Game()
 
 	al_set_new_window_title("Alien Alley");
 	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_FRAMELESS);
-	display = al_create_display(screenWidth, screenHeight);
+	// Set default screen width & height - this can be changed by the Allegro al_create_display function
+	screenSize.SetSize(640, 480);
+	display = al_create_display(screenSize.cx, screenSize.cy);
 	Game::checkInitialized(display, __FUNCTION__": failed to create Allegro display");
 	// Capture the what screen width and height were actually set
-	screenWidth = al_get_display_width(display);
-	screenHeight = al_get_display_height(display);
+	screenSize.SetSize(al_get_display_width(display), al_get_display_height(display));
 
 	timer = al_create_timer(1.0 / max(max(al_get_display_refresh_rate(display), al_get_new_display_refresh_rate()), 60.0));
 	Game::checkInitialized(timer, __FUNCTION__": failed to create Allegro timer");
@@ -107,7 +108,7 @@ Game::~Game()
 void Game::drawMessage()
 {
 	if (message[0] != NULL)
-		al_draw_text(font, al_map_rgb_f(1, 1, 1), screenWidth / 2, screenHeight / 2, ALLEGRO_ALIGN_CENTER, Game::message);
+		al_draw_text(font, al_map_rgb_f(1, 1, 1), screenSize.cx / 2, screenSize.cy / 2, ALLEGRO_ALIGN_CENTER, Game::message);
 }
 #endif // DEBUG
 

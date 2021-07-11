@@ -6,7 +6,7 @@
 // /_/   \_\_|_|\___|_| |_| /_/   \_\_|_|\___|\__, |
 //                                            |___/
 //
-//  Conversion/port copyright © Samuel Gomes & Neil Gomes, 1998-2020.
+//  Sourceport / mod copyright © Samuel Gomes
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -25,8 +25,7 @@ private:
 	const static int RESPAWN_TIMER_DEFAULT = 90;
 	const static int SHOT_TIMER_DEFAULT = 20;
 
-	int bufferWidth;					// framebuffer width
-	int bufferHeight;					// framebuffer height
+	CSize bufferSize;					// framebuffer width & height
 	int shotTimer;						// can we shoot?
 	int respawnTimer;					// can we respawn?
 	int invincibleTimer;				// hero invincibility
