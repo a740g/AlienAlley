@@ -13,9 +13,7 @@
 #pragma once
 
 #include <atltypes.h>
-#ifdef DEBUG
 #include <stdio.h>
-#endif // DEBUG
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_image.h>
@@ -24,6 +22,7 @@
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_audio.h>
 
+#include "Input.h"
 #include "Sprite.h"
 #include "MainMenu.h"
 #include "HUD.h"

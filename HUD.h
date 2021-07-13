@@ -28,7 +28,6 @@ private:
 	const static int SCORE_NUMBERS_TOP = 24;
 	const static int DIGITS_MAX = 7;															// max digits on the score panel
 
-	ALLEGRO_FONT* font;																			// for drawing game over message
 	ALLEGRO_BITMAP* digitSpriteSheet;															// digits bitmap for drawing score
 	CSize digitSpriteSize;																		// width & height of each digit
 	ALLEGRO_BITMAP* HUDBitmap;																	// bitmap for the HUD panel

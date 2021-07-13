@@ -177,7 +177,7 @@ bool Missiles::add(unsigned int type, bool straight, int x, int y)
 	shot[slot].type = type;
 	shot[slot].used = true;
 
-	// Pan and play the effects sound. TODO: Centering must account sprite size here and also elsewhere
+	// Pan and play the effects sound
 	al_play_sample(sample[type], 1, (2.0f * (float)x / (float)(bufferSize.cx - 1)) - 1.0f, 1, ALLEGRO_PLAYMODE_ONCE, nullptr);
 
 	return true;

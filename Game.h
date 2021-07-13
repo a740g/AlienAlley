@@ -15,6 +15,7 @@
 #include "AlienAlley.h"
 
 // Forward declarations
+class Input;
 class Aliens;
 class CelestialObjects;
 class Hero;
@@ -23,24 +24,17 @@ class MainMenu;
 class Game
 {
 private:
-	// Key see and released flags
-	const enum
-	{
-		KEY_SEEN = 1,
-		KEY_RELEASED
-	};
-
 	ALLEGRO_DISPLAY* display = nullptr;						// Allegro display
 	ALLEGRO_AUDIO_STREAM* music;							// Streaming music
 	ALLEGRO_TIMER* timer;									// Allegro timer
 	ALLEGRO_EVENT_QUEUE* queue;								// Allegro queue
-	ALLEGRO_FONT* font;										// for drawing game over message
+	ALLEGRO_FONT* font;										// for drawing onscreen / debugging message
 
-	unsigned char key[ALLEGRO_KEY_MAX];						// Key state array
 	unsigned long frames;									// How many frame did we render?
 	CSize screenSize;										// Screen width & Screen height - this is updated later
 
 	// Game objects
+	Input* input;
 	MainMenu* mainMenu;
 	CelestialObjects* celestialObjects;
 	HUD* gameHUD;
@@ -49,14 +43,12 @@ private:
 	Hero* hero;
 	Aliens* aliens;
 
-	void updateKeyboard(ALLEGRO_EVENT* event);
 	// Checks for all possible collisions
 	void checkCollisions();
 
 public:
-#ifdef DEBUG
-	static char message[UCHAR_MAX];							// onscreen message
-#endif // DEBUG
+	// String that can be used for onscreen messages or debugging
+	static char message[USHRT_MAX];
 
 	// Check if the operation succeeded and handle
 	static void checkInitialized(bool test, const char* description);
@@ -66,8 +58,6 @@ public:
 
 	Game();
 	~Game();
-#ifdef DEBUG
 	void drawMessage();
-#endif // DEBUG
 	void run();
 };

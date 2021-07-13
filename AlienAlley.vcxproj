@@ -22,7 +22,6 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{6CD6E26D-CF49-4AE8-B226-CCD8D4C16B2D}</ProjectGuid>
     <RootNamespace>AlienAlley</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -124,6 +123,8 @@
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WarningLevel>Level4</WarningLevel>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -179,6 +180,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Hero.cpp" />
     <ClCompile Include="HUD.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Missiles.cpp" />
     <ClCompile Include="Sprite.cpp" />
@@ -197,6 +199,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Hero.h" />
     <ClInclude Include="HUD.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="Missiles.h" />
     <ClInclude Include="resource.h" />

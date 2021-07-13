@@ -24,10 +24,6 @@ HUD::HUD()
     // Initialize the buffer width and height
     bufferSize.SetSize(al_get_display_width(al_get_current_display()), al_get_display_height(al_get_current_display()));
 
-    // Load the game font
-    font = al_create_builtin_font();
-    Game::checkInitialized(font, __FUNCTION__": failed to initialize Allegro font");
-
     // Load game assets
     digitSpriteSheet = al_load_bitmap("dat/gfx/digits_ss.png");
     Game::checkInitialized(digitSpriteSheet, __FUNCTION__": failed to load dat/gfx/digits_ss.png");
@@ -45,7 +41,6 @@ HUD::HUD()
 
 HUD::~HUD()
 {
-    al_destroy_font(font);
     al_destroy_bitmap(digitSpriteSheet);
     al_destroy_bitmap(HUDBitmap);
     al_destroy_bitmap(lifeBitmap);
@@ -113,7 +108,7 @@ void HUD::draw()
 
     // Finally draw game over message is no lives are left
     if (lives < 0)
-        al_draw_text(font, al_map_rgb_f(1, 1, 1), bufferSize.cx / 2, bufferSize.cy / 2, ALLEGRO_ALIGN_CENTER, "G A M E  O V E R");
+        strcpy_s(Game::message, sizeof(Game::message), "G A M E  O V E R");
 }
 
 int HUD::getDigit(int n, int p)

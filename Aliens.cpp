@@ -380,7 +380,7 @@ void Aliens::draw()
 	{
 		if (!alien[i].used)
 			continue;
-		if (alien[i].blinkTimer > 2)	// TODO: ???
+		if (alien[i].blinkTimer > 2)	// we make the alien sprite blink by not drawing it when hit
 			continue;
 
 		alien[i].sprite->draw();

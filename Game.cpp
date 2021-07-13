@@ -12,9 +12,8 @@
 
 #include "Game.h"
 
-#ifdef DEBUG
-char Game::message[UCHAR_MAX];
-#endif // DEBUG
+// String that can be used for onscreen messages or debugging
+char Game::message[USHRT_MAX];
 
 Game::Game()
 {
@@ -23,15 +22,9 @@ Game::Game()
 
 	Game::checkInitialized(al_init(), __FUNCTION__": failed to initialize Allegro");
 	Game::checkInitialized(al_init_native_dialog_addon(), __FUNCTION__": failed to initialize Allegro native dialog");
-	Game::checkInitialized(al_install_keyboard(), __FUNCTION__": failed to initialize Allegro keyboard");
 
-	// Reset the keyboard state array
-	memset(key, 0, sizeof(key));
-
-#ifdef DEBUG
-	// Clear debug message
-	memset(message, 0, sizeof(message));
-#endif // DEBUG
+	// Clear any message
+	message[0] = NULL;
 
 	al_set_new_window_title("Alien Alley");
 	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_FRAMELESS);
@@ -55,7 +48,7 @@ Game::Game()
 	Game::checkInitialized(al_init_acodec_addon(), __FUNCTION__": failed to initialize Allegro audio codecs");
 	Game::checkInitialized(al_reserve_samples(256), __FUNCTION__": failed to reserve Allegro samples");
 
-	al_register_event_source(queue, al_get_keyboard_event_source());
+	input = new Input(queue);
 	al_register_event_source(queue, al_get_display_event_source(display));
 	al_register_event_source(queue, al_get_timer_event_source(timer));
 
@@ -67,8 +60,6 @@ Game::Game()
 
 	/* load high-score file */
 	//TODO: HighScoresLoad()
-
-	al_hide_mouse_cursor(display);		// TODO: we need to move this to a good place later?
 
 	mainMenu = new MainMenu();							// Initialize main menu
 	celestialObjects = new CelestialObjects();			// Initizlize celestial objects
@@ -89,28 +80,25 @@ Game::~Game()
 	delete celestialObjects;
 	delete mainMenu;
 
-	al_show_mouse_cursor(display);
-
 	// Save high scores
 	//TODO: HighScoresSave();
 
 	al_destroy_audio_stream(music);		// TODO: This should move from here?
 
+	delete input;
+
 	al_destroy_font(font);
 	al_destroy_timer(timer);
 	al_destroy_event_queue(queue);
 	al_shutdown_native_dialog_addon();
-
 	al_destroy_display(display);
 }
 
-#ifdef DEBUG
 void Game::drawMessage()
 {
-	if (message[0] != NULL)
-		al_draw_text(font, al_map_rgb_f(1, 1, 1), screenSize.cx / 2, screenSize.cy / 2, ALLEGRO_ALIGN_CENTER, Game::message);
+	if (!message[0] == NULL)
+		al_draw_text(font, al_map_rgb_f(1, 1, 1), screenSize.cx / 2, screenSize.cy / 2, ALLEGRO_ALIGN_CENTER, message);
 }
-#endif // DEBUG
 
 // Check if a Allegro/program initialization succeeded
 // If not, it just ends with EXIT_FAILURE
@@ -131,26 +119,6 @@ int Game::between(int lo, int hi)
 float Game::between(float lo, float hi)
 {
 	return lo + ((float)rand() / (float)RAND_MAX) * (hi - lo);
-}
-
-// Updates the keyboard state array
-void Game::updateKeyboard(ALLEGRO_EVENT* event)
-{
-	switch (event->type)
-	{
-	case ALLEGRO_EVENT_TIMER:
-		for (int i = 0; i < ALLEGRO_KEY_MAX; i++)
-			key[i] &= KEY_SEEN;
-		break;
-
-	case ALLEGRO_EVENT_KEY_DOWN:
-		key[event->keyboard.keycode] = KEY_SEEN | KEY_RELEASED;
-		break;
-
-	case ALLEGRO_EVENT_KEY_UP:
-		key[event->keyboard.keycode] &= KEY_RELEASED;
-		break;
-	}
 }
 
 // Checks for all possible collisions
@@ -239,13 +207,18 @@ void Game::run()
 		case ALLEGRO_EVENT_TIMER:
 			FX->update();
 			missiles->update();
-			celestialObjects->update(key[ALLEGRO_KEY_UP]);		// TODO: this needs to the input agnostic
-			hero->update(key[ALLEGRO_KEY_LEFT], key[ALLEGRO_KEY_RIGHT], key[ALLEGRO_KEY_UP], key[ALLEGRO_KEY_DOWN], key[ALLEGRO_KEY_LCTRL] || key[ALLEGRO_KEY_SPACE] || key[ALLEGRO_KEY_RCTRL], *gameHUD, *missiles);
+			celestialObjects->update(input->isKeyboardPressed(ALLEGRO_KEY_UP) || input->isMousePressed(input->MOUSE_MOVE_UP));		// TODO: this needs to the input agnostic
+			hero->update(input->isKeyboardPressed(ALLEGRO_KEY_LEFT) || input->isMousePressed(input->MOUSE_MOVE_LEFT),
+				input->isKeyboardPressed(ALLEGRO_KEY_RIGHT) || input->isMousePressed(input->MOUSE_MOVE_RIGHT),
+				input->isKeyboardPressed(ALLEGRO_KEY_UP) || input->isMousePressed(input->MOUSE_MOVE_UP),
+				input->isKeyboardPressed(ALLEGRO_KEY_DOWN) || input->isMousePressed(input->MOUSE_MOVE_DOWN),
+				input->isKeyboardPressed(ALLEGRO_KEY_LCTRL) || input->isKeyboardPressed(ALLEGRO_KEY_SPACE) || input->isKeyboardPressed(ALLEGRO_KEY_RCTRL) || input->isMousePressed(input->MOUSE_BUTTON_LEFT) || input->isMousePressed(input->MOUSE_BUTTON_RIGHT),
+				*gameHUD, *missiles);
 			aliens->update(frames, *hero, *gameHUD, *missiles, *FX);
 			gameHUD->update();
 			checkCollisions();
 
-			if (key[ALLEGRO_KEY_ESCAPE])
+			if (input->isKeyboardPressed(ALLEGRO_KEY_ESCAPE))
 				done = true;
 
 			redraw = true;
@@ -260,7 +233,7 @@ void Game::run()
 		if (done)
 			break;
 
-		updateKeyboard(&event);
+		input->update(&event);
 
 		if (redraw && al_is_event_queue_empty(queue))
 		{
@@ -272,9 +245,7 @@ void Game::run()
 			FX->draw();
 			hero->draw(*gameHUD);
 			gameHUD->draw();
-#ifdef DEBUG
 			drawMessage();
-#endif // DEBUG
 
 			al_flip_display();
 			redraw = false;
